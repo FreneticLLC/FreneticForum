@@ -79,18 +79,18 @@ namespace TestForum.Models
         public BsonDocument CreateEmptyUserDocument()
         {
             BsonDocument user = new BsonDocument();
-            user["uid"] = (long)-1;
-            user["username"] = "example";
-            user["password"] = "This Won't Be Usable";
-            user["email"] = "example@example.com";
-            user["display_name"] = "Example";
-            user["banned"] = false;
-            user["banned_until"] = "";
-            user["ban_reason"] = "";
-            user["active"] = false;
-            user["activation_code"] = "<Unusable>?";
-            user["register_date"] = ForumUtilities.DateNow();
-            user["last_login_date"] = "Never";
+            user[Account.UID] = (long)-1;
+            user[Account.USERNAME] = "example";
+            user[Account.PASSWORD] = "This Won't Be Usable";
+            user[Account.EMAIL] = "example@example.com";
+            user[Account.DISPLAY_NAME] = "Example";
+            user[Account.BANNED] = false;
+            user[Account.BANNED_UNTIL] = "";
+            user[Account.BAN_REASON] = "";
+            user[Account.ACTIVE] = false;
+            user[Account.ACTIVATION_CODE] = "<Unusable>?";
+            user[Account.REGISTER_DATE] = ForumUtilities.DateNow();
+            user[Account.LAST_LOGIN_DATE] = "Never";
             return user;
         }
 
@@ -98,11 +98,11 @@ namespace TestForum.Models
         {
             uname = uname.ToLowerInvariant();
             BsonDocument bd = CreateEmptyUserDocument();
-            bd["username"] = uname;
-            bd["password"] = ForumUtilities.Hash(pw, uname);
-            bd["email"] = email;
-            bd["uid"] = getIDFor(TF_USERS);
-            bd["activation_code"] = ForumUtilities.GetRandomHex(32);
+            bd[Account.USERNAME] = uname;
+            bd[Account.PASSWORD] = ForumUtilities.Hash(pw, uname);
+            bd[Account.EMAIL] = email;
+            bd[Account.UID] = getIDFor(TF_USERS);
+            bd[Account.ACTIVATION_CODE] = ForumUtilities.GetRandomHex(32);
             return bd;
         }
 
@@ -110,12 +110,12 @@ namespace TestForum.Models
         {
             IMongoCollection<BsonDocument> userbase = Database.GetCollection<BsonDocument>(TF_USERS);
             BsonDocument user = CreateEmptyUserDocument();
-            user["uid"] = (long)0;
-            user["username"] = "admin";
-            user["display_name"] = "Administrator";
-            user["password"] = ForumUtilities.Hash(pw, "admin");
-            user["active"] = true;
-            FilterDefinition<BsonDocument> fd = Builders<BsonDocument>.Filter.Eq("uid", (long)0);
+            user[Account.UID] = (long)0;
+            user[Account.USERNAME] = "admin";
+            user[Account.DISPLAY_NAME] = "Administrator";
+            user[Account.PASSWORD] = ForumUtilities.Hash(pw, "admin");
+            user[Account.PASSWORD] = true;
+            FilterDefinition<BsonDocument> fd = Builders<BsonDocument>.Filter.Eq(Account.UID, (long)0);
             UpdateOptions uo = new UpdateOptions() { IsUpsert = true };
             userbase.ReplaceOneAsync(fd, user, uo).Wait();
         }
@@ -158,27 +158,27 @@ namespace TestForum.Models
         public Account GetAccount(string name)
         {
             IMongoCollection<BsonDocument> userbase = Database.GetCollection<BsonDocument>(TF_USERS);
-            FilterDefinition<BsonDocument> fd = Builders<BsonDocument>.Filter.Eq("name", name);
-            ProjectionDefinition<BsonDocument> proj = Builders<BsonDocument>.Projection.Include("uid").Include("name");
-            BsonDocument acc = userbase.Find(fd).Project(proj).FirstAsync().Result;
+            FilterDefinition<BsonDocument> fd = Builders<BsonDocument>.Filter.Eq(Account.USERNAME, name);
+            ProjectionDefinition<BsonDocument> proj = Builders<BsonDocument>.Projection.Include(Account.UID).Include(Account.USERNAME);
+            BsonDocument acc = userbase.Find(fd).Project(proj).FirstOrDefaultAsync().Result;
             if (acc == null)
             {
                 return null;
             }
-            return new Account(userbase, (string)acc["name"], (long)acc["uid"]);
+            return new Account(userbase, (string)acc[Account.USERNAME], (long)acc[Account.UID]);
         }
 
         public Account GetAccount(long uid)
         {
             IMongoCollection<BsonDocument> userbase = Database.GetCollection<BsonDocument>(TF_USERS);
-            FilterDefinition<BsonDocument> fd = Builders<BsonDocument>.Filter.Eq("uid", uid);
-            ProjectionDefinition<BsonDocument> proj = Builders<BsonDocument>.Projection.Include("uid").Include("name");
-            BsonDocument acc = userbase.Find(fd).Project(proj).FirstAsync().Result;
+            FilterDefinition<BsonDocument> fd = Builders<BsonDocument>.Filter.Eq(Account.UID, uid);
+            ProjectionDefinition<BsonDocument> proj = Builders<BsonDocument>.Projection.Include(Account.UID).Include(Account.USERNAME);
+            BsonDocument acc = userbase.Find(fd).Project(proj).FirstOrDefaultAsync().Result;
             if (acc == null)
             {
                 return null;
             }
-            return new Account(userbase, (string)acc["name"], (long)acc["uid"]);
+            return new Account(userbase, (string)acc[Account.USERNAME], (long)acc[Account.UID]);
         }
     }
 }

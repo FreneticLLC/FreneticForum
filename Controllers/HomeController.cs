@@ -15,7 +15,7 @@ namespace TestForum.Controllers
         {
             try
             {
-                ForumInit init = new ForumInit();
+                ForumInit init = new ForumInit(Request);
                 ViewData["init"] = init;
                 return View();
             }
@@ -30,7 +30,7 @@ namespace TestForum.Controllers
         {
             try
             {
-                ForumInit init = new ForumInit();
+                ForumInit init = new ForumInit(Request);
                 Response.Redirect("/");
                 return new EmptyResult();
             }

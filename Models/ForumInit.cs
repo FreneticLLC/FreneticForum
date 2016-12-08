@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.IO;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 
 namespace TestForum.Models
 {
@@ -45,8 +47,11 @@ namespace TestForum.Models
             return toret;
         }
 
-        public ForumInit()
+        public HttpRequest Request;
+
+        public ForumInit(HttpRequest htr)
         {
+            Request = htr;
             Config = GetConfig();
             if (Config == null || Config.Count == 0)
             {

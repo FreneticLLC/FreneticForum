@@ -1,0 +1,42 @@
+@{
+    ForumInit init = (ForumInit)ViewData["init"];
+    string usernameQuery = init.Request.Query["user"];
+    string uidQuery = init.Request.Query["uid"];
+    long uidc = -1;
+    if (uidQuery != null)
+    {
+        if (!long.TryParse(uidQuery, out uidc))
+        {
+            uidc = -1;
+        }
+    }
+    Account account = null;
+    if (usernameQuery != null && uidc == -1)
+    {
+        account = init.Database.GetAccount(usernameQuery);
+    }
+    else if (uidc != -1)
+    {
+        account = init.Database.GetAccount(uidc);
+    }
+    if (account == null)
+    {
+        ViewData["Title"] = "Unknown Account | Account System";
+        <p>Unknown Account Specified!</p>
+        return;
+    }
+    else
+    {
+        ViewData["Title"] = "Account: " + account.UserName + " | Account System";
+    }
+    BsonDocument doc = account.Projected(Account.REGISTER_DATE, Account.LAST_LOGIN_DATE, Account.DISPLAY_NAME, Account.ACTIVE, Account.BANNED);
+}
+<table>
+    <tr><td>Display Name</td><td>@doc[Account.DISPLAY_NAME]</td></tr>
+    <tr><td>Username</td><td>@account.UserName</td></tr>
+    <tr><td>User-ID</td><td>@account.UserID</td></tr>
+    <tr><td>Registered</td><td>@doc[Account.REGISTER_DATE]</td></tr>
+    <tr><td>Last Login Date</td><td>@doc[Account.LAST_LOGIN_DATE]</td></tr>
+    <tr><td>Active?</td><td>@doc[Account.ACTIVE]</td></tr>
+    <tr><td>Banned?</td><td>@doc[Account.BANNED]</td></tr>
+</table>
