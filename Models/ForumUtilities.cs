@@ -10,6 +10,19 @@ namespace TestForum.Models
 {
     public static class ForumUtilities
     {
+        public static bool IsSafePassword(string input)
+        {
+            if (input.Contains(' ') || input.Contains('\'') || input.Contains('\"'))
+            {
+                return false;
+            }
+            if (input.Length < 10)
+            {
+                return false;
+            }
+            return true;
+        }
+
         public static string Pad2Z(int input)
         {
             if (input < 10)

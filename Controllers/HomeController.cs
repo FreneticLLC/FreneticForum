@@ -9,6 +9,8 @@ namespace TestForum.Controllers
 {
     public class HomeController : Controller
     {
+        // TODO: Error()
+
         public IActionResult Index()
         {
             try

@@ -29,7 +29,9 @@ namespace TestForum.Models
             if (Database.ListCollectionsAsync(lco).Result.AnyAsync().Result)
             {
                 // We have the database already, somehow. Trying to re-create them will error, so we'll do nothing for now.
-                return;
+                //return;
+                // Actually, let's give an error. A big shiny one. That way we don't fight with an existing installation!
+                throw new InvalidOperationException("Trying to install a forum to a database that already has a forum in it!");
             }
             // Create the base collections
             Database.CreateCollectionAsync(TF_USERS).Wait();

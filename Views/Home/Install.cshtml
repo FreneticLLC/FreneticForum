@@ -2,12 +2,32 @@
     ViewData["Title"] = "TestForum Install Page";
 }
 
-Hello!
+The below is the full configuration for installation of the TestForum.
+<br>If you are not intentionally at this page, please contact the server administrator!
+<br>This is a dangerous page, be sure you know what you're inputting!
+<br>Input stupid values at your own risk! Our systems can only protect against so much...
+
 <form id="Submitto" method="POST">
-    <br>Forum Name: <input type="text" name="forum_name" value="My TestForum" />
-    <br>Forum Database URL: <input type="text" name="forum_dburl" value="" />
-    <br>Forum Database Name: <input type="text" name="forum_dbname" value="testforum" />
-    <br>Admin Password: <input type="password" name="admin_password" value="" />
+    <br><b>Forum Name</b>
+    <br>The name of the forum for all display purposes.
+    <br>Can be changed later.
+    <br><input type="text" name="forum_name" value="My TestForum" />
+    <br><b>Forum Database URL</b>
+    <br>The URL of the MongoDB database for log-in purposes!
+    <br>In the format: `<code>mongodb://USERNAME:PASSWORD@IP:PORT/DBNAME</code>`
+    <br>EG, one might use `<code>mongodb://testforum:TopSecret@localhost:27017/testforum</code>`
+    <br><input type="text" name="forum_dburl" value="" />
+    <br><b>Forum Database Name</b>
+    <br>The name of the database within MongoDB to use.
+    <br>Generally matches the `<code>DBNAME</code>` above.
+    <br><input type="text" name="forum_dbname" value="testforum" />
+    <br><b>Admin password</b>
+    <br>The password for the root 'admin' login.
+    <br>Can be changed later.
+    <br>After you finish installation, use account 'admin' with this password to log in and start configuring the forum!
+    <br>Please choose a SECURE password. That is, at LEAST 10 characters in length and generally complex.
+    <br>However, do not include spaces or quote symbols! All other symbols are fine, though use non-ASCII at your own risk.
+    <br><input type="password" name="admin_password" value="" />
     <br><input type="submit" value="Install TestForum!"/>
 </form>
 
@@ -19,21 +39,28 @@ Hello!
         string title = (string)ViewData["tf_form_title"];
         string dburl = (string)ViewData["tf_form_dburl"];
         string dbname = (string)ViewData["tf_form_dbname"];
-        if (admin_pw != null && title != null)
+        if (admin_pw != null && title != null && dburl != null && dbname != null)
         {
-            ForumDatabase db = new ForumDatabase(dburl, dbname);
-            ForumInit.SaveNewConfig(dburl, dbname);
-            db.InstallAll(admin_pw, title);
-            ((HttpResponse)ViewData["response"]).Redirect("/");
+            if (!ForumUtilities.IsSafePassword(admin_pw))
+            {
+                info = "<b>ERROR</b>: Failed, unsafe password!";
+            }
+            else
+            {
+                ForumDatabase db = new ForumDatabase(dburl, dbname);
+                db.InstallAll(admin_pw, title);
+                ForumInit.SaveNewConfig(dburl, dbname);
+                ((HttpResponse)ViewData["response"]).Redirect("/");
+            }
         }
         else
         {
-            info = "Failed, null inputs!";
+            info = "<b>ERROR</b>: Failed, null inputs!";
         }
     }
     else
     {
-        info = "Ignored, not posted!";
+        info = "";
     }
 }
-<br>@info
+<br>@Html.Raw(info)
