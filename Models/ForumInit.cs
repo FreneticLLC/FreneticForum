@@ -12,12 +12,21 @@ namespace TestForum.Models
         public const string CONFIG_FILE_LOCATION = "C:/testforum/testforum.cfg";
         // -------------- EDIT ABOVE ---------------- //
 
+        public static void SaveNewConfig(string dbpath, string dbname)
+        {
+            File.WriteAllText(CONFIG_FILE_LOCATION, "database_path: " + dbpath + "\ndatabase_db: " + dbname + "\n");
+        }
+
         public ForumDatabase Database;
 
         public Dictionary<string, string> Config;
 
         public Dictionary<string, string> GetConfig()
         {
+            if (!File.Exists(CONFIG_FILE_LOCATION))
+            {
+                return null;
+            }
             string[] data = File.ReadAllText(CONFIG_FILE_LOCATION).Replace("\r", "\n").Split('\n');
             Dictionary<string, string> toret = new Dictionary<string, string>();
             foreach (string str in data)
@@ -39,7 +48,14 @@ namespace TestForum.Models
         public ForumInit()
         {
             Config = GetConfig();
-            Database = new ForumDatabase(Config["database_path"], Config["database_db"]);
+            if (Config == null || Config.Count == 0)
+            {
+                throw new InitFailedException();
+            }
+            else
+            {
+                Database = new ForumDatabase(Config["database_path"], Config["database_db"]);
+            }
         }
     }
 }

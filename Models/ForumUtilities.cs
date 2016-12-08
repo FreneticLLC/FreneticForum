@@ -10,6 +10,24 @@ namespace TestForum.Models
 {
     public static class ForumUtilities
     {
+        public static string Pad2Z(int input)
+        {
+            if (input < 10)
+            {
+                return "0" + input;
+            }
+            return input.ToString();
+        }
+
+        public static string DateNow()
+        {
+            DateTime dt = DateTime.Now;
+            DateTime utc = dt.ToUniversalTime();
+            TimeSpan rel = dt.Subtract(utc);
+            string timezone = rel.TotalHours < 0 ? rel.TotalHours.ToString(): ("+" + rel.TotalHours);
+            return dt.Year + "/" + Pad2Z(dt.Month) + "/" + Pad2Z(dt.Day) + " " + Pad2Z(dt.Hour) + ":" + Pad2Z(dt.Minute) + ":" + Pad2Z(dt.Second) + " UTC" + timezone + ":00";
+        }
+
         public static Encoding Enc = new UTF8Encoding(false);
 
         public static SHA512 sha = SHA512.Create();

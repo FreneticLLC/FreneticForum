@@ -1,9 +1,39 @@
 @{
-    ViewData["Title"] = "Forum Install Page";
+    ViewData["Title"] = "TestForum Install Page";
 }
 
 Hello!
+<form id="Submitto" method="POST">
+    <br>Forum Name: <input type="text" name="forum_name" value="My TestForum" />
+    <br>Forum Database URL: <input type="text" name="forum_dburl" value="" />
+    <br>Forum Database Name: <input type="text" name="forum_dbname" value="testforum" />
+    <br>Admin Password: <input type="password" name="admin_password" value="" />
+    <br><input type="submit" value="Install TestForum!"/>
+</form>
 
 @{
-    ((ForumInit)ViewData["init"]).Database.InstallAll();
+    string info = "";
+    if ((bool)ViewData["is_post"])
+    {
+        string admin_pw = (string)ViewData["tf_form_admin_pw"];
+        string title = (string)ViewData["tf_form_title"];
+        string dburl = (string)ViewData["tf_form_dburl"];
+        string dbname = (string)ViewData["tf_form_dbname"];
+        if (admin_pw != null && title != null)
+        {
+            ForumDatabase db = new ForumDatabase(dburl, dbname);
+            ForumInit.SaveNewConfig(dburl, dbname);
+            db.InstallAll(admin_pw, title);
+            ((HttpResponse)ViewData["response"]).Redirect("/");
+        }
+        else
+        {
+            info = "Failed, null inputs!";
+        }
+    }
+    else
+    {
+        info = "Ignored, not posted!";
+    }
 }
+<br>@info

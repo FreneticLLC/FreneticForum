@@ -57,6 +57,7 @@ If you're seeing this, you're probably horrendously lost.
     - Also has: `email` (string), `display_name` (string), `password` (hashed binary string)
     - Also has: `banned` (bool), `banned_until` (date string), `ban_reason` (string)
     - Also has: `active` (bool), `activation_code` (string)
+    - Also has: `register_date` (date string), `last_login_date` (date string)
 - tf_settings
     - Index on: `name` (string)
     - Also has: `value` (string)

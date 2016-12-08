@@ -87,6 +87,8 @@ namespace TestForum.Models
             user["ban_reason"] = "";
             user["active"] = false;
             user["activation_code"] = "<Unusable>?";
+            user["register_date"] = ForumUtilities.DateNow();
+            user["last_login_date"] = "Never";
             return user;
         }
 
@@ -116,6 +118,13 @@ namespace TestForum.Models
             userbase.ReplaceOneAsync(fd, user, uo).Wait();
         }
 
+        public void SetSetting(IMongoCollection<BsonDocument> settings, string setting, string value)
+        {
+            BsonDocument doc = new BsonDocument();
+            doc["name"] = setting;
+            doc["value"] = value;
+        }
+
         public void InstallDefaultSettings()
         {
             IMongoCollection<BsonDocument> settings = Database.GetCollection<BsonDocument>(TF_SETTINGS);
@@ -128,11 +137,14 @@ namespace TestForum.Models
             }
         }
 
-        public void InstallAll()
+        public void InstallAll(string admin_pw, string title)
         {
             InstallCollections();
             InstallDefaultSettings();
-            InstallDefaultUser("temporary!");
+            InstallDefaultUser(admin_pw);
+            // Common Configuration
+            IMongoCollection<BsonDocument> settings = Database.GetCollection<BsonDocument>(TF_SETTINGS);
+            SetSetting(settings, "title", title);
         }
 
         public ForumDatabase(string conStr, string db)
