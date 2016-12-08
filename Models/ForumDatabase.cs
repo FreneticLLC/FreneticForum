@@ -122,9 +122,26 @@ namespace TestForum.Models
 
         public void SetSetting(IMongoCollection<BsonDocument> settings, string setting, string value)
         {
+            setting = setting.ToLowerInvariant();
             BsonDocument doc = new BsonDocument();
             doc["name"] = setting;
             doc["value"] = value;
+            UpdateOptions uo = new UpdateOptions() { IsUpsert = true };
+            FilterDefinition<BsonDocument> fd = Builders<BsonDocument>.Filter.Eq("name", setting);
+            settings.ReplaceOneAsync(fd, doc, uo).Wait();
+        }
+
+        public string GetSetting(string setting, string def)
+        {
+            setting = setting.ToLowerInvariant();
+            IMongoCollection<BsonDocument> settings = Database.GetCollection<BsonDocument>(TF_SETTINGS);
+            FilterDefinition<BsonDocument> fd = Builders<BsonDocument>.Filter.Eq("name", setting);
+            BsonDocument bsd = settings.Find(fd).FirstOrDefaultAsync().Result;
+            if (bsd == null)
+            {
+                return def;
+            }
+            return bsd["value"].AsString;
         }
 
         public void InstallDefaultSettings()

@@ -1,8 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
+@{
+    ForumInit init = (ForumInit)ViewData["init"];
+    string Title = "TestForum";
+    if (init != null)
+    {
+        Title = init.Database.GetSetting("title", Title);
+    }
+}
     <meta charset="utf-8" />
-    <title>@ViewData["Title"] | TestForum</title>
+    <title>@ViewData["Title"] | @Title</title>
 </head>
 <body>
         @RenderBody()
