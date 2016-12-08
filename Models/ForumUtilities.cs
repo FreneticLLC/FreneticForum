@@ -22,7 +22,7 @@ namespace TestForum.Models
 
         public static bool SlowEquals(byte[] a, byte[] b)
         {
-            var diff = (uint)a.Length ^ (uint)b.Length;
+            uint diff = (uint)a.Length ^ (uint)b.Length;
             for (int i = 0; i < a.Length && i < b.Length; i++)
             {
                 diff |= (uint)(a[i] ^ b[i]);
@@ -32,7 +32,7 @@ namespace TestForum.Models
 
         private static byte[] GetPbkdf2Bytes(string password, byte[] salt, int iterations, int outputBytes)
         {
-            var pbkdf2 = new Rfc2898DeriveBytes(password, salt);
+            Rfc2898DeriveBytes pbkdf2 = new Rfc2898DeriveBytes(password, salt);
             pbkdf2.IterationCount = iterations;
             return pbkdf2.GetBytes(outputBytes);
         }

@@ -9,24 +9,40 @@ namespace TestForum.Models
 {
     public class ForumDatabase
     {
+        public const string TF_USERS = "tf_users";
+        public const string TF_SETTINGS = "tf_settings";
+        public const string TF_SECTIONS = "tf_sections";
+        public const string TF_TOPICS = "tf_topics";
+        public const string TF_POSTS = "tf_posts";
+
+        public string[] TFS = new string[] { TF_USERS, TF_SETTINGS, TF_SECTIONS, TF_TOPICS, TF_POSTS };
+
+        public string[] TFS_WITH_UIDS = new string[] { TF_USERS, TF_SECTIONS, TF_TOPICS, TF_POSTS };
         public MongoClient Client;
 
         public IMongoDatabase Database;
 
         public void InstallCollections()
         {
+            ListCollectionsOptions lco = new ListCollectionsOptions();
+            lco.Filter = new FilterDefinitionBuilder<BsonDocument>().Eq("name", TF_USERS);
+            if (Database.ListCollectionsAsync(lco).Result.AnyAsync().Result)
+            {
+                // We have the database already, somehow. Trying to re-create them will error, so we'll do nothing for now.
+                return;
+            }
             // Create the base collections
-            Database.CreateCollectionAsync("tf_users").Wait();
-            Database.CreateCollectionAsync("tf_settings").Wait();
-            Database.CreateCollectionAsync("tf_sections").Wait();
-            Database.CreateCollectionAsync("tf_topics").Wait();
-            Database.CreateCollectionAsync("tf_posts").Wait();
+            Database.CreateCollectionAsync(TF_USERS).Wait();
+            Database.CreateCollectionAsync(TF_SETTINGS).Wait();
+            Database.CreateCollectionAsync(TF_SECTIONS).Wait();
+            Database.CreateCollectionAsync(TF_TOPICS).Wait();
+            Database.CreateCollectionAsync(TF_POSTS).Wait();
             // Grab the collections
-            IMongoCollection<BsonDocument> tf_users = Database.GetCollection<BsonDocument>("tf_users");
-            IMongoCollection<BsonDocument> tf_settings = Database.GetCollection<BsonDocument>("tf_settings");
-            IMongoCollection<BsonDocument> tf_sections = Database.GetCollection<BsonDocument>("tf_sections");
-            IMongoCollection<BsonDocument> tf_topics = Database.GetCollection<BsonDocument>("tf_topics");
-            IMongoCollection<BsonDocument> tf_posts = Database.GetCollection<BsonDocument>("tf_posts");
+            IMongoCollection<BsonDocument> tf_users = Database.GetCollection<BsonDocument>(TF_USERS);
+            IMongoCollection<BsonDocument> tf_settings = Database.GetCollection<BsonDocument>(TF_SETTINGS);
+            IMongoCollection<BsonDocument> tf_sections = Database.GetCollection<BsonDocument>(TF_SECTIONS);
+            IMongoCollection<BsonDocument> tf_topics = Database.GetCollection<BsonDocument>(TF_TOPICS);
+            IMongoCollection<BsonDocument> tf_posts = Database.GetCollection<BsonDocument>(TF_POSTS);
             // Ensure their 'Indexes'
             CreateIndexOptions options = new CreateIndexOptions() { Unique = true };
             // 'uid' for users.
@@ -40,10 +56,22 @@ namespace TestForum.Models
             tf_settings.Indexes.CreateOneAsync(new IndexKeysDefinitionBuilder<BsonDocument>().Ascending(nameField), options);
             // 'name' for sections.
             tf_sections.Indexes.CreateOneAsync(new IndexKeysDefinitionBuilder<BsonDocument>().Ascending(nameField), options);
+            // 'uid' for sections.
+            tf_sections.Indexes.CreateOneAsync(new IndexKeysDefinitionBuilder<BsonDocument>().Ascending(uidField), options);
             // 'uid' for topics.
             tf_topics.Indexes.CreateOneAsync(new IndexKeysDefinitionBuilder<BsonDocument>().Ascending(uidField), options);
             // 'uid' for posts.
             tf_posts.Indexes.CreateOneAsync(new IndexKeysDefinitionBuilder<BsonDocument>().Ascending(uidField), options);
+        }
+
+        public long getIDFor(string mode)
+        {
+            IMongoCollection<BsonDocument> tf_settings = Database.GetCollection<BsonDocument>(TF_SETTINGS);
+            string id_target = "_internal.counter_ids." + mode;
+            FilterDefinition<BsonDocument> fd = new FilterDefinitionBuilder<BsonDocument>().Eq("name", id_target);
+            UpdateDefinition<BsonDocument> ud = new UpdateDefinitionBuilder<BsonDocument>().Inc("value", (long)1);
+            BsonDocument res = tf_settings.FindOneAndUpdateAsync(fd, ud).Result;
+            return res["value"].AsInt64;
         }
 
         public BsonDocument CreateEmptyUserDocument()
@@ -57,23 +85,54 @@ namespace TestForum.Models
             user["banned"] = false;
             user["banned_until"] = "";
             user["ban_reason"] = "";
+            user["active"] = false;
+            user["activation_code"] = "<Unusable>?";
             return user;
+        }
+
+        public BsonDocument GenerateNewUser(string uname, string pw, string email)
+        {
+            uname = uname.ToLowerInvariant();
+            BsonDocument bd = CreateEmptyUserDocument();
+            bd["username"] = uname;
+            bd["password"] = ForumUtilities.Hash(pw, uname);
+            bd["email"] = email;
+            bd["uid"] = getIDFor(TF_USERS);
+            bd["activation_code"] = ForumUtilities.GetRandomHex(32);
+            return bd;
         }
 
         public void InstallDefaultUser(string pw)
         {
-            IMongoCollection<BsonDocument> userbase = Database.GetCollection<BsonDocument>("tf_users");
+            IMongoCollection<BsonDocument> userbase = Database.GetCollection<BsonDocument>(TF_USERS);
             BsonDocument user = CreateEmptyUserDocument();
             user["uid"] = (long)0;
             user["username"] = "admin";
             user["display_name"] = "Administrator";
-            user["password"] = ForumUtilities.Hash(pw, user["username"].AsString); // TODO: Hash!
-            userbase.InsertOneAsync(user).Wait();
+            user["password"] = ForumUtilities.Hash(pw, "admin");
+            user["active"] = true;
+            FilterDefinition<BsonDocument> fd = new FilterDefinitionBuilder<BsonDocument>().Eq("uid", (long)0);
+            UpdateOptions uo = new UpdateOptions() { IsUpsert = true };
+            userbase.ReplaceOneAsync(fd, user, uo).Wait();
         }
 
         public void InstallDefaultSettings()
         {
-            IMongoCollection<BsonDocument> settings = Database.GetCollection<BsonDocument>("tf_settings");
+            IMongoCollection<BsonDocument> settings = Database.GetCollection<BsonDocument>(TF_SETTINGS);
+            foreach (string str in TFS_WITH_UIDS)
+            {
+                BsonDocument doc = new BsonDocument();
+                doc["name"] = "_internal.counter_ids." + str;
+                doc["value"] = (long)100;
+                settings.InsertOneAsync(doc);
+            }
+        }
+
+        public void InstallAll()
+        {
+            InstallCollections();
+            InstallDefaultSettings();
+            InstallDefaultUser("temporary!");
         }
 
         public ForumDatabase(string conStr, string db)

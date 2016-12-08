@@ -1,0 +1,9 @@
+@{
+    ViewData["Title"] = "Forum Install Page";
+}
+
+Hello!
+
+@{
+    ((ForumInit)ViewData["init"]).Database.InstallAll();
+}

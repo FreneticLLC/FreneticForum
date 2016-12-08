@@ -56,14 +56,15 @@ If you're seeing this, you're probably horrendously lost.
     - Index on: `uid` (long), `username` (string)
     - Also has: `email` (string), `display_name` (string), `password` (hashed binary string)
     - Also has: `banned` (bool), `banned_until` (date string), `ban_reason` (string)
+    - Also has: `active` (bool), `activation_code` (string)
 - tf_settings
     - Index on: `name` (string)
     - Also has: `value` (string)
 - tf_sections
-    - Index on: `name` (string)
-    - Also has: `description` (string), `topic_uids` (array of longs)
+    - Index on: `name` (string), `uid` (long)
+    - Also has: `description` (string)
 - tf_topics
-    - Index on: `uid` (long)
+    - Index on: `uid` (long) `section_id` (long)
     - Also has: `title` (string), `main_post` (long), `post_uids` (array of longs)
 - tf_posts
     - Index on: `uid` (long)

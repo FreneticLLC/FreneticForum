@@ -12,6 +12,14 @@ namespace TestForum.Controllers
         public IActionResult Index()
         {
             ForumInit init = new ForumInit();
+            ViewData["init"] = init;
+            return View();
+        }
+
+        public IActionResult Install()
+        {
+            ForumInit init = new ForumInit();
+            ViewData["init"] = init;
             return View();
         }
     }
