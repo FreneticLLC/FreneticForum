@@ -4,10 +4,24 @@ Welcome to mcmonkey's "Test Forum" in ASP.NET Core!
 
 If you're seeing this, you're probably horrendously lost.
 
+### Notice
+
+At current stage, TestForum is Copyright (C) 2016 FreneticXYZ, All Rights Reserved.
+
+Licensing is likely to change in the future.
+
 ### Setup
 
-- To change your config file location, edit the marked variable near the top of `ForumInit.cs`.
-    - View sample file, `wwwroot/sample_config.cfg`.
+- Create, setup, and reasonably secure a MongoDB server instance.
+    - You will need a (non-admin) user with `readWrite` access to a single db.
+- Connect to the server in the default path to be automatically directed to the install page.
+    - Make sure config file folder is editable by the server process user.
+    - To change your config file location, edit the marked variable near the top of `ForumInit.cs`.
+- Configure everything as per instructions, and press the button at the bottom.
+- You can log in as `admin` with the password you gave on the install page.
+- It is recommended at this point that you register yourself a separate account, and give it admin access of its own, so that you are not logging in as the root admin normally.
+- Configure the forum however you wish via the administrative control panel.
+- Invite some users and start posting!
 
 ### Plan / Outline
 
@@ -21,6 +35,7 @@ If you're seeing this, you're probably horrendously lost.
     - An engine to parse BBCode.
     - Supports an administrator-definable list of BBCodes, including a sample set that can be modified.
     - In a simple user-friendly format, EG: `[b]{{TEXT:1}}[/b]` : `<b>{{TEXT:1}}</b>` to convert BBCode bold to HTML bold.
+    - Reasonable limitations available. EG: for `[size={{INTEGER[1,7]:1}}]{{TEXT:2}}[/size]` as a basis for font sizes, limited to be between 1 and 7, and only integer typed.
 - Forum
     - Index
         - Display a list of all sections.
@@ -47,8 +62,12 @@ If you're seeing this, you're probably horrendously lost.
         - Initializes the backing database with some basic empty collections, and one default admin user, which is configured by installing admin.
     - Admin Panel
         - Full control of the entire system.
+    - Moderator Panel
+        - Control over and information on user activities (EG reports).
     - User Control Panel
+        - Good level of control for a user over their own account.
     - User Private Messaging (PM) Service
+        - Way for users to contact each other.
 
 ### Database Outline
 
@@ -67,6 +86,23 @@ If you're seeing this, you're probably horrendously lost.
 - tf_topics
     - Index on: `uid` (long) `section_id` (long)
     - Also has: `title` (string), `main_post` (long), `post_uids` (array of longs)
+    - Also has `tags` (array of strings)
 - tf_posts
     - Index on: `uid` (long)
     - Also has: `contents` (BBCode string), `author_uid` (long), `author_username` (string), `post_date` (date string)
+
+### Random Concept Write-Ups
+
+- Forum user/post reporting
+    - Rather than provide a built-in report system separate from existing functionality,
+    - It is likely best to set up a "quiet" "self-only" forum section.
+    - This section would show a user their own reports and postings in it by themselves and admins, but not other users' reports.
+    - Admins can freely browse the section.
+    - Goes well with the tag system to mark a report open/resolved/etc.
+- Tag System
+    - Forum topics can be tagged.
+    - This is for searchability and content visibility.
+    - EG, a topic might be tagged "Open" initially, then changed to "Resolved" later.
+    - Allows multiple tags per topic.
+    - Common tags can be configured by admins to be selected-from and given special indiciation color.
+    - Alternately, users can specify their own uncolored tags.
