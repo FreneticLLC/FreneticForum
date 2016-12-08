@@ -25,7 +25,7 @@ namespace TestForum.Models
         public void InstallCollections()
         {
             ListCollectionsOptions lco = new ListCollectionsOptions();
-            lco.Filter = new FilterDefinitionBuilder<BsonDocument>().Eq("name", TF_USERS);
+            lco.Filter = Builders<BsonDocument>.Filter.Eq("name", TF_USERS);
             if (Database.ListCollectionsAsync(lco).Result.AnyAsync().Result)
             {
                 // We have the database already, somehow. Trying to re-create them will error, so we'll do nothing for now.
@@ -70,7 +70,7 @@ namespace TestForum.Models
         {
             IMongoCollection<BsonDocument> tf_settings = Database.GetCollection<BsonDocument>(TF_SETTINGS);
             string id_target = "_internal.counter_ids." + mode;
-            FilterDefinition<BsonDocument> fd = new FilterDefinitionBuilder<BsonDocument>().Eq("name", id_target);
+            FilterDefinition<BsonDocument> fd = Builders<BsonDocument>.Filter.Eq("name", id_target);
             UpdateDefinition<BsonDocument> ud = new UpdateDefinitionBuilder<BsonDocument>().Inc("value", (long)1);
             BsonDocument res = tf_settings.FindOneAndUpdateAsync(fd, ud).Result;
             return res["value"].AsInt64;
@@ -115,7 +115,7 @@ namespace TestForum.Models
             user["display_name"] = "Administrator";
             user["password"] = ForumUtilities.Hash(pw, "admin");
             user["active"] = true;
-            FilterDefinition<BsonDocument> fd = new FilterDefinitionBuilder<BsonDocument>().Eq("uid", (long)0);
+            FilterDefinition<BsonDocument> fd = Builders<BsonDocument>.Filter.Eq("uid", (long)0);
             UpdateOptions uo = new UpdateOptions() { IsUpsert = true };
             userbase.ReplaceOneAsync(fd, user, uo).Wait();
         }
@@ -153,6 +153,32 @@ namespace TestForum.Models
         {
             Client = new MongoClient(conStr);
             Database = Client.GetDatabase(db);
+        }
+
+        public Account GetAccount(string name)
+        {
+            IMongoCollection<BsonDocument> userbase = Database.GetCollection<BsonDocument>(TF_USERS);
+            FilterDefinition<BsonDocument> fd = Builders<BsonDocument>.Filter.Eq("name", name);
+            ProjectionDefinition<BsonDocument> proj = Builders<BsonDocument>.Projection.Include("uid").Include("name");
+            BsonDocument acc = userbase.Find(fd).Project(proj).FirstAsync().Result;
+            if (acc == null)
+            {
+                return null;
+            }
+            return new Account(userbase, (string)acc["name"], (long)acc["uid"]);
+        }
+
+        public Account GetAccount(long uid)
+        {
+            IMongoCollection<BsonDocument> userbase = Database.GetCollection<BsonDocument>(TF_USERS);
+            FilterDefinition<BsonDocument> fd = Builders<BsonDocument>.Filter.Eq("uid", uid);
+            ProjectionDefinition<BsonDocument> proj = Builders<BsonDocument>.Projection.Include("uid").Include("name");
+            BsonDocument acc = userbase.Find(fd).Project(proj).FirstAsync().Result;
+            if (acc == null)
+            {
+                return null;
+            }
+            return new Account(userbase, (string)acc["name"], (long)acc["uid"]);
         }
     }
 }
