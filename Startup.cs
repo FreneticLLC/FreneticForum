@@ -9,9 +9,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using WebApplication.Models;
+using TestForum.Models;
 
-namespace WebApplication
+namespace TestForum
 {
     public class Startup
     {
