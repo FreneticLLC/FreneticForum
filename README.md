@@ -10,6 +10,10 @@ At current stage, TestForum is Copyright (C) 2016 FreneticXYZ, All Rights Reserv
 
 Licensing is likely to change in the future.
 
+### Project Status
+
+Early development. Nothing is remotely ready to use!
+
 ### Setup
 
 - Create, setup, and reasonably secure a MongoDB server instance.
