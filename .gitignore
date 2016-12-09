@@ -235,3 +235,6 @@ _Pvt_Extensions
 
 # VS Code
 .vscode/
+
+# Minified CSS
+*.min.css

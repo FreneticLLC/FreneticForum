@@ -10,9 +10,9 @@ namespace TestForum.Models
 {
     public class ForumInit
     {
-        // -------------- EDIT BELOW ---------------- //
+        // ----------------------------- EDIT BELOW ------------------------ //
         public const string CONFIG_FILE_LOCATION = "C:/testforum/testforum.cfg";
-        // -------------- EDIT ABOVE ---------------- //
+        // ----------------------------- EDIT ABOVE ------------------------- //
 
         public static void SaveNewConfig(string dbpath, string dbname)
         {
@@ -48,6 +48,8 @@ namespace TestForum.Models
         }
 
         public HttpRequest Request;
+
+        public Account User = null;
 
         public ForumInit(HttpRequest htr)
         {

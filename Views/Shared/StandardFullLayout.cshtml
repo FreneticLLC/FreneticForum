@@ -11,8 +11,32 @@
 }
     <meta charset="utf-8" />
     <title>@ViewData["Title"] | @Title</title>
+    <link rel="stylesheet" href="/css/ForumBasic.min.css?vary=1" type="text/css" />
 </head>
 <body>
-        @RenderBody()
+    <div class="container">
+        <div class="header">
+            <div class="left_header">
+                <a href="/">@Title
+                <br><img src="/images/core/forum_logo.png" /></a>
+            </div>
+            <div class="right_header">
+                @if (init.User == null)
+                {
+                    <span><b>Notice:</b>
+                    <br>You are browsing as a guest!
+                    <br>You may <a href="/Account/Register">register</a>
+                    <br>or <a href="/Account/Login">login</a>.</span>
+                }
+                else
+                {
+                    <span>(Account Info Here)</span>
+                }
+            </div>
+        </div>
+    </div>
+    <center>
+    </center>
+    @RenderBody()
 </body>
 </html>
