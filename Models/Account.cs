@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
-namespace TestForum.Models
+namespace FreneticForum.Models
 {
     public class Account
     {

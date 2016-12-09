@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using TestForum.Models;
+using FreneticForum.Models;
 
-namespace TestForum.Controllers
+namespace FreneticForum.Controllers
 {
     public class AccountController : Controller
     {

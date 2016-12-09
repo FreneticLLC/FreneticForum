@@ -6,12 +6,12 @@ using System.IO;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 
-namespace TestForum.Models
+namespace FreneticForum.Models
 {
     public class ForumInit
     {
         // ----------------------------- EDIT BELOW ------------------------ //
-        public const string CONFIG_FILE_LOCATION = "C:/testforum/testforum.cfg";
+        public const string CONFIG_FILE_LOCATION = "C:/FreneticForum/FreneticForum.cfg";
         // ----------------------------- EDIT ABOVE ------------------------- //
 
         public static void SaveNewConfig(string dbpath, string dbname)

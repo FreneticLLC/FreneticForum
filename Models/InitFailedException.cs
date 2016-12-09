@@ -6,7 +6,7 @@ using System.IO;
 using System.Text;
 using System.Security.Cryptography;
 
-namespace TestForum.Models
+namespace FreneticForum.Models
 {
     public class InitFailedException : Exception
     {

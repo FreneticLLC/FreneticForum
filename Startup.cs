@@ -7,9 +7,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using TestForum.Models;
+using FreneticForum.Models;
 
-namespace TestForum
+namespace FreneticForum
 {
     public class Startup
     {

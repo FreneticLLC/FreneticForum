@@ -1,12 +1,12 @@
-# "Test Forum" in ASP.NET Core
+# FreneticForum
 
-Welcome to mcmonkey's "Test Forum" in ASP.NET Core!
+Welcome to the Frenetic Forum, built in ASP.NET Core MVC!
 
 If you're seeing this, you're probably horrendously lost.
 
 ### Notice
 
-At current stage, TestForum is Copyright (C) 2016 FreneticXYZ, All Rights Reserved.
+At current stage, FreneticForum is Copyright (C) 2016 FreneticXYZ, All Rights Reserved.
 
 Licensing is likely to change in the future.
 
