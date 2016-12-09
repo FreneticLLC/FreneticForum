@@ -24,6 +24,10 @@ The below is the full configuration for installation of the FreneticForum.
             {
                 info = "<b>ERROR</b>: Failed, unsafe password!";
             }
+            else if (!mainurl.Contains("."))
+            {
+                info = "<b>EROR</B>: Failed, invalid URL specification!";
+            }
             else
             {
                 ForumDatabase db = new ForumDatabase(dburl, dbname);
@@ -42,23 +46,30 @@ The below is the full configuration for installation of the FreneticForum.
 <form id="Submitto" method="POST">
     <br><span class="emphasis">Forum Name</span>
     <br>The name of the forum for all display purposes.
-    <br>Can be changed later.
+    <br>@ForumUtilities.CHECKMARK Can be changed later.
     <br><input type="text" name="forum_name" value="My FreneticForum" class="wide_input_box" />
     <br><span class="emphasis">Forum Database URL</span>
     <br>The URL of the MongoDB database for log-in purposes!
     <br>In the format: <code>mongodb://USERNAME:PASSWORD@IP:PORT/DBNAME</code>
     <br>EG, one might use <code>mongodb://freneticforum:TopSecret@localhost:27017/freneticforum</code>
+    <br>@ForumUtilities.BIG_X Can NOT be changed later.
     <br><input type="text" name="forum_dburl" value="" class="wide_input_box" />
     <br><span class="emphasis">Forum Database Name</span>
     <br>The name of the database within MongoDB to use.
     <br>Generally matches the <code>DBNAME</code> above.
+    <br>@ForumUtilities.BIG_X Can NOT be changed later.
     <br><input type="text" name="forum_dbname" value="freneticforum" class="wide_input_box" />
+    <br><span class="emphasis">Forum Main URL</span>
+    <br>The URL to this forum. In the format <code>example.com</code>. Do not include <code>http://</code> or similar.
+    <br>@ForumUtilities.CHECKMARK Can be changed later.
+    <br><input type="text" name="forum_mainurl" value="" class="wide_input_box" />
     <br><span class="emphasis">Admin password</span>
     <br>The password for the root 'admin' login.
     <br>Can be changed later.
     <br>After you finish installation, use account 'admin' with this password to log in and start configuring the forum!
     <br>Please choose a SECURE password. That is, at LEAST 10 characters in length and generally complex.
     <br>However, do not include spaces or quote symbols! All other symbols are fine, though use non-ASCII at your own risk.
+    <br>@ForumUtilities.CHECKMARK Can be changed later.
     <br><input type="password" name="admin_password" value="" class="wide_input_box" />
     <br><input type="submit" value="Install FreneticForum!"/>
 </form>

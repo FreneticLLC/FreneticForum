@@ -11,11 +11,14 @@ namespace FreneticForum.Models
     public class ForumInit
     {
         // ----------------------------- EDIT BELOW ------------------------ //
-        public const string CONFIG_FILE_LOCATION = "C:/FreneticForum/FreneticForum.cfg";
+        public const string CONFIG_FILE_FOLDER_LOCATION = "./FreneticForum/";
         // ----------------------------- EDIT ABOVE ------------------------- //
+
+        public const string CONFIG_FILE_LOCATION = CONFIG_FILE_FOLDER_LOCATION + "FreneticForum.cfg";
 
         public static void SaveNewConfig(string dbpath, string dbname)
         {
+            Directory.CreateDirectory(CONFIG_FILE_FOLDER_LOCATION);
             File.WriteAllText(CONFIG_FILE_LOCATION, "database_path: " + dbpath + "\ndatabase_db: " + dbname + "\n");
         }
 

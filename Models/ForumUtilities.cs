@@ -16,6 +16,10 @@ namespace FreneticForum.Models
 
         public static HtmlString BULLET = new HtmlString("&#9899;");
 
+        public static HtmlString CHECKMARK = new HtmlString("&#10003;");
+
+        public static HtmlString BIG_X = new HtmlString("&#10008;");
+
         public static bool IsSafePassword(string input)
         {
             if (input.Contains(' ') || input.Contains('\'') || input.Contains('\"'))

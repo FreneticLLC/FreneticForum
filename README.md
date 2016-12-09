@@ -19,8 +19,8 @@ Early development. Nothing is remotely ready to use!
 - Create, setup, and reasonably secure a MongoDB server instance.
     - You will need a (non-admin) user with `readWrite` access to a single db.
 - Connect to the server in the path its at (Server URL, or `localhost` with port `8050` by default) to be automatically directed to the install page.
-    - Make sure config file folder is editable by the server process user.
-    - To change your config file location, edit the marked variable near the top of `ForumInit.cs`.
+    - Make sure config file folder is editable by the server process user. (Defaults to local path, `./FreneticForum/`)
+    - To change your config file folder location, edit the marked variable near the top of `ForumInit.cs`.
 - Configure everything as per instructions, and press the button at the bottom.
 - You can log in as `admin` with the password you gave on the install page.
 - It is recommended at this point that you register yourself a separate account, and give it admin access of its own, so that you are not logging in as the root admin normally.
