@@ -57,6 +57,7 @@ namespace FreneticForum.Controllers
                 ViewData["tf_form_title"] = Request.Form["forum_name"].ToString();
                 ViewData["tf_form_dburl"] = Request.Form["forum_dburl"].ToString();
                 ViewData["tf_form_dbname"] = Request.Form["forum_dbname"].ToString();
+                ViewData["tf_form_mainurl"] = Request.Form["forum_mainurl"].ToString();
             }
             ViewData["response"] = Response;
             return View();

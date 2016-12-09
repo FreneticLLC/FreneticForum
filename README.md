@@ -18,7 +18,7 @@ Early development. Nothing is remotely ready to use!
 
 - Create, setup, and reasonably secure a MongoDB server instance.
     - You will need a (non-admin) user with `readWrite` access to a single db.
-- Connect to the server in the default path to be automatically directed to the install page.
+- Connect to the server in the path its at (Server URL, or `localhost` with port `8050` by default) to be automatically directed to the install page.
     - Make sure config file folder is editable by the server process user.
     - To change your config file location, edit the marked variable near the top of `ForumInit.cs`.
 - Configure everything as per instructions, and press the button at the bottom.

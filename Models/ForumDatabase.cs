@@ -196,7 +196,7 @@ namespace FreneticForum.Models
             }
         }
 
-        public void InstallAll(string admin_pw, string title)
+        public void InstallAll(string admin_pw, string title, string mainurl)
         {
             InstallCollections();
             InstallDefaultSettings();
@@ -204,7 +204,7 @@ namespace FreneticForum.Models
             // Common Configuration
             IMongoCollection<BsonDocument> settings = Database.GetCollection<BsonDocument>(TF_SETTINGS);
             SetSetting(settings, "title", title);
-            SetSetting(settings, "global_views", (long)0);
+            SetSetting(settings, "main_url", mainurl);
         }
 
         public ForumDatabase(string conStr, string db)

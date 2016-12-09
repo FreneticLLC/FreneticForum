@@ -9,6 +9,36 @@ The below is the full configuration for installation of the FreneticForum.
 
 @ForumUtilities.SECTION_SEPARATOR
 
+@{
+    string info = "";
+    if ((bool)ViewData["is_post"])
+    {
+        string admin_pw = (string)ViewData["tf_form_admin_pw"];
+        string title = (string)ViewData["tf_form_title"];
+        string dburl = (string)ViewData["tf_form_dburl"];
+        string dbname = (string)ViewData["tf_form_dbname"];
+        string mainurl = (string)ViewData["tf_form_mainurl"];
+        if (admin_pw != null && title != null && dburl != null && dbname != null && mainurl != null)
+        {
+            if (!ForumUtilities.IsSafePassword(admin_pw))
+            {
+                info = "<b>ERROR</b>: Failed, unsafe password!";
+            }
+            else
+            {
+                ForumDatabase db = new ForumDatabase(dburl, dbname);
+                db.InstallAll(admin_pw, title, mainurl);
+                ForumInit.SaveNewConfig(dburl, dbname);
+                ((HttpResponse)ViewData["response"]).Redirect("/");
+            }
+        }
+        else
+        {
+            info = "<b>ERROR</b>: Failed, null inputs!";
+        }
+    }
+}
+
 <form id="Submitto" method="POST">
     <br><span class="emphasis">Forum Name</span>
     <br>The name of the forum for all display purposes.
@@ -33,32 +63,4 @@ The below is the full configuration for installation of the FreneticForum.
     <br><input type="submit" value="Install FreneticForum!"/>
 </form>
 
-@{
-    string info = "";
-    if ((bool)ViewData["is_post"])
-    {
-        string admin_pw = (string)ViewData["tf_form_admin_pw"];
-        string title = (string)ViewData["tf_form_title"];
-        string dburl = (string)ViewData["tf_form_dburl"];
-        string dbname = (string)ViewData["tf_form_dbname"];
-        if (admin_pw != null && title != null && dburl != null && dbname != null)
-        {
-            if (!ForumUtilities.IsSafePassword(admin_pw))
-            {
-                info = "<b>ERROR</b>: Failed, unsafe password!";
-            }
-            else
-            {
-                ForumDatabase db = new ForumDatabase(dburl, dbname);
-                db.InstallAll(admin_pw, title);
-                ForumInit.SaveNewConfig(dburl, dbname);
-                ((HttpResponse)ViewData["response"]).Redirect("/");
-            }
-        }
-        else
-        {
-            info = "<b>ERROR</b>: Failed, null inputs!";
-        }
-    }
-}
 <br>@Html.Raw(info)
