@@ -5,11 +5,17 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Text;
 using System.Security.Cryptography;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Html;
 
 namespace FreneticForum.Models
 {
     public static class ForumUtilities
     {
+        public static HtmlString SECTION_SEPARATOR = new HtmlString("</div><div class=\"section\">");
+
+        public static HtmlString BULLET = new HtmlString("&#9899;");
+
         public static bool IsSafePassword(string input)
         {
             if (input.Contains(' ') || input.Contains('\'') || input.Contains('\"'))

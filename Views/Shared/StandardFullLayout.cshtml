@@ -21,7 +21,11 @@
                 <br><img src="/images/core/forum_logo.png" /></a>
             </div>
             <div class="right_header">
-                @if (init.User == null)
+                @if (init == null)
+                {
+                    <span>Account manager will be here!</span>
+                }
+                else if (init.User == null)
                 {
                     <span><b>Notice:</b>
                     <br>You are browsing as a guest!
@@ -34,9 +38,11 @@
                 }
             </div>
         </div>
+        <div class="content">
+            <div class="section">
+                @RenderBody()
+            </div>
+        </div>
     </div>
-    <center>
-    </center>
-    @RenderBody()
 </body>
 </html>

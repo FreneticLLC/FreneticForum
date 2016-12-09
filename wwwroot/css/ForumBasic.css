@@ -9,10 +9,10 @@ body
 {
     position: relative;
     font-family: Arial, Sans, sans-serif;
-    font-size: 15px;
+    font-size: 16px;
     background-color: #292929;
     min-width: 900px;
-    color: #ffffff;
+    color: #EEEEEE;
 }
 .container
 {
@@ -21,8 +21,8 @@ body
 .header
 {
     position: relative;
-    /* Height: About logo size (100px) + font-size (15px) */
-    height: 130px;
+    /* Height: About logo size (100px) + font-size (16px) plus border-bottom-radius (15px) */
+    height: 131px;
     width: 90%;
     left: 5%;
     border-bottom-left-radius: 15px;
@@ -68,4 +68,38 @@ a:hover
 a:visited
 {
     color: #007700;
+}
+.content
+{
+    position: relative;
+    width: 90%;
+    left: 5%;
+    padding-bottom: 180px;
+}
+.section
+{
+    position: relative;
+    background-color:#000000;
+    margin-top: 15px;
+    padding: 1em 2em;
+    border: 1px solid #00AA00;
+    border-radius: 25px;
+}
+.wide_input_box
+{
+    width: 700px;
+    font-size: 120%;
+}
+code
+{
+    background-color: #222222;
+    color: #FFFFFF;
+    border: 1px solid #999900;
+    border-radius: 3px;
+}
+.emphasis
+{
+    font-size: 115%;
+    font-weight: bold;
+    color: #FFFFFF;
 }
