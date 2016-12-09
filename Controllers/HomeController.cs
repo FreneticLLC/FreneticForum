@@ -9,14 +9,24 @@ namespace TestForum.Controllers
 {
     public class HomeController : Controller
     {
-        // TODO: Error()
+        public IActionResult ErrorInternal()
+        {
+            ViewData["init"] = new ForumInit(Request);
+            return View();
+        }
+
+        public IActionResult Error404()
+        {
+            ViewData["init"] = new ForumInit(Request);
+            return View();
+        }
 
         public IActionResult Index()
         {
+            // Somewhat special case: Redirect to install page if not installed!
             try
             {
-                ForumInit init = new ForumInit(Request);
-                ViewData["init"] = init;
+                ViewData["init"] = new ForumInit(Request);
                 return View();
             }
             catch (InitFailedException)
@@ -28,6 +38,7 @@ namespace TestForum.Controllers
 
         public IActionResult Install()
         {
+            // SUPER SPECIAL CASE: Install page is only valid IF regular pages ARE NOT!
             try
             {
                 ForumInit init = new ForumInit(Request);
