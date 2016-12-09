@@ -30,7 +30,7 @@ body
     border-left: 1px solid #00AA00;
     border-right: 1px solid #00AA00;
     border-bottom: 1px solid #00AA00;
-    background-color:#010101;
+    background-color: #010101;
     white-space: nowrap;
 }
 .left_header
@@ -56,6 +56,7 @@ body
     border-right: 1px solid #00AAAA;
     border-bottom: 1px solid #00AAAA;
     border-top: 1px solid #00AAAA;
+    padding: 5px;
 }
 a:link
 {
@@ -79,11 +80,28 @@ a:visited
 .section
 {
     position: relative;
-    background-color:#000000;
+    background-color: #000000;
     margin-top: 15px;
     padding: 1em 2em;
     border: 1px solid #00AA00;
     border-radius: 25px;
+}
+.footer
+{
+    position: relative;
+    width: 90%;
+    left: 5%;
+    margin-top: -167px;
+    padding-top: 15px;
+    text-align: center;
+    height: 150px;
+    min-height: 80px;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    border-left: 1px solid #00AA00;
+    border-right: 1px solid #00AA00;
+    border-top: 1px solid #00AA00;
+    background-color: #010101;
 }
 .wide_input_box
 {
