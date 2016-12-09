@@ -45,7 +45,12 @@
         </div>
     </div>
     <div class="footer">
-        Footer!
+        @{
+            string utcnow = ForumUtilities.DateNow();
+            long views = init == null ? 0 : init.Database.getViewCounter("global");
+        }
+        Page Retrieved: <code>@utcnow</code>!
+        <br>Site views: <code>@views</code>!
     </div>
 </body>
 </html>

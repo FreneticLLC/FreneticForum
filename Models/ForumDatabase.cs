@@ -72,7 +72,23 @@ namespace FreneticForum.Models
             string id_target = "_internal.counter_ids." + mode;
             FilterDefinition<BsonDocument> fd = Builders<BsonDocument>.Filter.Eq("name", id_target);
             UpdateDefinition<BsonDocument> ud = new UpdateDefinitionBuilder<BsonDocument>().Inc("value", (long)1);
-            BsonDocument res = tf_settings.FindOneAndUpdateAsync(fd, ud).Result;
+            FindOneAndUpdateOptions<BsonDocument> uo = new FindOneAndUpdateOptions<BsonDocument>() { IsUpsert = true };
+            BsonDocument res = tf_settings.FindOneAndUpdateAsync(fd, ud, uo).Result;
+            return res["value"].AsInt64;
+        }
+
+        public long getViewCounter(string page)
+        {
+            IMongoCollection<BsonDocument> tf_settings = Database.GetCollection<BsonDocument>(TF_SETTINGS);
+            string id_target = "count_views." + page;
+            FilterDefinition<BsonDocument> fd = Builders<BsonDocument>.Filter.Eq("name", id_target);
+            UpdateDefinition<BsonDocument> ud = new UpdateDefinitionBuilder<BsonDocument>().Inc("value", (long)1);
+            FindOneAndUpdateOptions<BsonDocument> uo = new FindOneAndUpdateOptions<BsonDocument>() { IsUpsert = true };
+            BsonDocument res = tf_settings.FindOneAndUpdateAsync(fd, ud, uo).Result;
+            if (res == null)
+            {
+                return 0;
+            }
             return res["value"].AsInt64;
         }
 
@@ -120,6 +136,17 @@ namespace FreneticForum.Models
             userbase.ReplaceOneAsync(fd, user, uo).Wait();
         }
 
+        public void SetSetting(IMongoCollection<BsonDocument> settings, string setting, long value)
+        {
+            setting = setting.ToLowerInvariant();
+            BsonDocument doc = new BsonDocument();
+            doc["name"] = setting;
+            doc["value"] = value;
+            UpdateOptions uo = new UpdateOptions() { IsUpsert = true };
+            FilterDefinition<BsonDocument> fd = Builders<BsonDocument>.Filter.Eq("name", setting);
+            settings.ReplaceOneAsync(fd, doc, uo).Wait();
+        }
+
         public void SetSetting(IMongoCollection<BsonDocument> settings, string setting, string value)
         {
             setting = setting.ToLowerInvariant();
@@ -144,6 +171,19 @@ namespace FreneticForum.Models
             return bsd["value"].AsString;
         }
 
+        public long GetLongSetting(string setting, long def)
+        {
+            setting = setting.ToLowerInvariant();
+            IMongoCollection<BsonDocument> settings = Database.GetCollection<BsonDocument>(TF_SETTINGS);
+            FilterDefinition<BsonDocument> fd = Builders<BsonDocument>.Filter.Eq("name", setting);
+            BsonDocument bsd = settings.Find(fd).FirstOrDefaultAsync().Result;
+            if (bsd == null)
+            {
+                return def;
+            }
+            return bsd["value"].AsInt64;
+        }
+
         public void InstallDefaultSettings()
         {
             IMongoCollection<BsonDocument> settings = Database.GetCollection<BsonDocument>(TF_SETTINGS);
@@ -164,6 +204,7 @@ namespace FreneticForum.Models
             // Common Configuration
             IMongoCollection<BsonDocument> settings = Database.GetCollection<BsonDocument>(TF_SETTINGS);
             SetSetting(settings, "title", title);
+            SetSetting(settings, "global_views", (long)0);
         }
 
         public ForumDatabase(string conStr, string db)
