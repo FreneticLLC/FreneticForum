@@ -2,4 +2,11 @@
     ViewData["Title"] = "Main Page";
 }
 
+@{
+    string bbc_test = "[b]Hello![/b]";
+    HtmlString bbc_res = BBCodeHelper.ParseBBode(bbc_test);
+}
+
 Hello!
+<br>
+@bbc_res
