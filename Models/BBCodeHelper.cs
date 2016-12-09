@@ -16,17 +16,17 @@ namespace FreneticForum.Models
         public static List<BBCode> GetDefaultBBCodes()
         {
             List<BBCode> list = new List<BBCode>();
-            list.Add(new BBCode("[b]{{TEXT:1}}[/b]", "<b>{{1}}</b>", "[b]Bold Text[/b]"));
-            list.Add(new BBCode("[i]{{TEXT:1}}[/i]", "<i>{{1}}</i>", "[i]Italic Text[/i]"));
-            list.Add(new BBCode("[e]{{TEXT:1}}[/e]", "<span class=\"emphasis\">{{1}}</span>", "[e]Emphasized Text[/e]"));
-            list.Add(new BBCode("[c]{{PLAIN_TEXT:1}}[/c]", "<code>{{1}}</code>", "[c]Code Snippet[/c}"));
-            list.Add(new BBCode("[s]{{TEXT:1}}[/s]", "<span class=\"strike\">{{1}}</span>", "[s]Striked-Through Text[/s]"));
-            list.Add(new BBCode("[u]{{TEXT:1}}[/u]", "<span class=\"underline\">{{1}}</span>", "[u]Underline Text[/u]"));
-            list.Add(new BBCode("[size={{INTEGER(7,60):1}}]{{TEXT:2}}[/size]", "<span style=\"font-size:{{1}};\">{{2}}</span>", "[size=25]Resized Text[/size]"));
+            list.Add(new BBCode("b", "<b>", "</b>", "Bold Text"));
+            list.Add(new BBCode("i", "<i>", "</i>", "Italic Text"));
+            list.Add(new BBCode("e", "<span class=\"emphasis\">", "</span>", "Emphasized Text"));
+            list.Add(new BBCode("c", "<code>", "</code>", "Code Block", true));
+            list.Add(new BBCode("s", "<span class=\"strike\">", "</span>", "Strike-Through Text"));
+            list.Add(new BBCode("u", "<span class=\"underline\">", "</span>", "Underlined Text"));
+            list.Add(new BBCode("size", "<span style=\"font-size:{{VALUE}}px;\">", "</span>", "Resized Text (value from 7 to 60)") { Low = 7, High = 60 });
             return list;
         }
 
-        public static List<BBCode> BBCodesKnown = null;
+        public static List<BBCode> BBCodesKnown = null; // TODO: Dictionary?
 
         public static List<BBCode> ActualBBCodes()
         {
@@ -36,52 +36,109 @@ namespace FreneticForum.Models
 
         private static string BBC_Internal(List<BBCode> codes, string input, int depth = 0)
         {
-            // TODO: This probably needs a redesign.
             if (depth > 500)
             {
                 return "(BBCode ignored, too deep...)";
             }
-            int flb = input.IndexOf('[');
-            int lrb = input.LastIndexOf(']');
-            if (flb == -1 || lrb == -1)
+            StringBuilder res = new StringBuilder();
+            for (int i = 0; i < input.Length; i++)
             {
-                return input;
-            }
-            string first = input.Substring(0, flb);
-            string subst = input.Substring(flb, (lrb + 1) - flb);
-            string last = input.Substring(lrb + 1);
-            foreach (BBCode bbc in codes)
-            {
-                Match m = bbc.Tester.Match(subst);
-                if (!m.Success)
+                if (input[i] == '[')
                 {
+                    StringBuilder tag = new StringBuilder();
+                    int t = i + 1;
+                    while (t < input.Length)
+                    {
+                        if (input[t] == ']')
+                        {
+                            break;
+                        }
+                        tag.Append(input[t++]);
+                    }
+                    string tag_str = tag.ToString();
+                    int ind = tag_str.IndexOf('=');
+                    string tag_id = tag_str.Substring(0, ind < 0 ? tag_str.Length : ind).ToLowerInvariant();
+                    string tag_value = ind < 0 ? "" : tag_str.Substring(ind + 1);
+                    t++;
+                    StringBuilder content = new StringBuilder();
+                    int selfs = 1;
+                    bool gottem = false;
+                    while (t < input.Length)
+                    {
+                        if (input[t] == '[')
+                        {
+                            StringBuilder subTag = new StringBuilder();
+                            t++;
+                            while (t < input.Length)
+                            {
+                                if (input[t] == ']')
+                                {
+                                    break;
+                                }
+                                subTag.Append(input[t++]);
+                            }
+                            string subtag_str = subTag.ToString();
+                            int subind = tag_str.IndexOf('=');
+                            string subtag_id = subtag_str;
+                            if (subtag_id == tag_id)
+                            {
+                                selfs++;
+                            }
+                            else if (subtag_id == "/" + tag_id)
+                            {
+                                selfs--;
+                            }
+                            if (selfs == 0)
+                            {
+                                string innerData = content.ToString();
+                                Console.WriteLine("Tag " + tag_id + " with innards: " + innerData);
+                                foreach (BBCode code in codes)
+                                {
+                                    if (code.BBC == tag_id)
+                                    {
+                                        if (!code.Plainify)
+                                        {
+                                            innerData = BBC_Internal(codes, innerData, depth + 1);
+                                        }
+                                        string repl = "";
+                                        if (code.Low != -1 || code.High != -1)
+                                        {
+                                            int outp;
+                                            if (!int.TryParse(tag_value, out outp))
+                                            {
+                                                break;
+                                            }
+                                            if (outp < code.Low || outp > code.High)
+                                            {
+                                                outp = code.Low;
+                                            }
+                                            repl = outp.ToString();
+                                        }
+                                        innerData = code.HTMLPrefix.Replace("{{VALUE}}", repl) + innerData + code.HTMLSuffix.Replace("{{VALUE}}", repl);
+                                        break;
+                                    }
+                                }
+                                res.Append(innerData);
+                                i = t;
+                                gottem = true;
+                                break;
+                            }
+                            else
+                            {
+                                content.Append("[" + subtag_str);
+                            }
+                        }
+                        content.Append(input[t++]);
+                    }
+                    if (!gottem)
+                    {
+                        res.Append("[");
+                    }
                     continue;
                 }
-                string before = input.Substring(0, m.Index);
-                int aind = m.Index + m.Length + 1;
-                string after = aind >= input.Length ? "" : input.Substring(aind);
-                string res = bbc.HTML;
-                foreach (KeyValuePair<string, BBCodeLimits> entry in bbc.AllLimits)
-                {
-                    string inner = m.Groups[entry.Key].ToString();
-                    if (!entry.Value.Plainify)
-                    {
-                        inner = BBC_Internal(codes, input, depth + 1);
-                    }
-                    if (entry.Value.High != -1 && int.Parse(inner) > entry.Value.High)
-                    {
-                        inner = entry.Value.High.ToString();
-                    }
-                    if (entry.Value.Low != -1 && int.Parse(inner) < entry.Value.Low)
-                    {
-                        inner = entry.Value.Low.ToString();
-                    }
-                    inner = inner.Replace("{", "&#123;").Replace("}", "&#124;");
-                    res = res.Replace("{{" + entry.Key + "}}", inner);
-                }
-                return first + res + last;
+                res.Append(input[i]);
             }
-            return input;
+            return res.ToString().Replace("\n", "\n<br>");
             
         }
 
@@ -101,83 +158,29 @@ namespace FreneticForum.Models
         }
     }
 
-    public class BBCodeLimits
+    public class BBCode
     {
-        public bool Plainify = false;
+        public string BBC;
+
+        public string HTMLPrefix;
+
+        public string HTMLSuffix;
+
+        public string Help;
+
+        public bool Plainify;
 
         public int Low = -1;
 
         public int High = -1;
-    }
 
-    public class BBCode
-    {
-        public static Regex RG_FINDER = new Regex("{{([A-Z]+)(\\((\\d+),(\\d+)\\))?:(\\d+)}}", RegexOptions.Compiled);
-
-        public string BBC;
-
-        public string HTML;
-
-        public string Help;
-
-        public Regex Tester;
-
-        public Dictionary<string, BBCodeLimits> AllLimits = new Dictionary<string, BBCodeLimits>();
-
-        public BBCode(string _bbc, string _html, string _help)
+        public BBCode(string _bbc, string _htmlpre, string _htmlsuf, string _help, bool _plainify = false)
         {
-            if (!_bbc.StartsWith("[") || !_bbc.EndsWith("]"))
-            {
-                throw new Exception("Invalid BBCode!");
-            }
             BBC = _bbc;
-            HTML = _html;
+            HTMLPrefix = _htmlpre;
+            HTMLSuffix = _htmlsuf;
             Help = _help;
-            // {{TEXT:1}} becomes (?<1>.*)
-            StringBuilder sb = new StringBuilder();
-            int start = 0;
-            for (int i = 1; i < _bbc.Length; i++)
-            {
-                if (i <= start)
-                {
-                    continue;
-                }
-                string sub = _bbc.Substring(start, i - start);
-                Match m = RG_FINDER.Match(sub);
-                if (m.Success)
-                {
-                    sb.Append(Regex.Escape(sub.Substring(0, m.Index)));
-                    start = i;
-                    string id = m.Groups[5].ToString();
-                    BBCodeLimits limits = new BBCodeLimits();
-                    switch (m.Groups[1].ToString())
-                    {
-                        case "TEXT":
-                            sb.Append("(?<" + id + ">[^\\[]*)");
-                            break;
-                        case "PLAIN_TEXT":
-                            sb.Append("(?<" + id + ">^\\[]*)");
-                            limits.Plainify = true;
-                            break;
-                        case "INTEGER":
-                            int lowMax = -1;
-                            int highMax = -1;
-                            limits.Plainify = true;
-                            if (m.Groups.Count > 3 && int.TryParse(m.Groups[3].ToString(), out lowMax) && int.TryParse(m.Groups[4].ToString(), out highMax))
-                            {
-                                limits.Low = lowMax;
-                                limits.High = highMax;
-                            }
-                            sb.Append("(?<" + id + ">\\d+)");
-                            break;
-                        default:
-                            throw new Exception("Invalid regex option: " + m.Groups[1]);
-                    }
-                    AllLimits[id] = limits;
-                }
-            }
-            sb.Append(Regex.Escape(_bbc.Substring(start)));
-            Tester = new Regex(sb.ToString(), RegexOptions.Compiled);
+            Plainify = _plainify;
         }
     }
 }

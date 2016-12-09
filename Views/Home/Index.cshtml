@@ -3,7 +3,8 @@
 }
 
 @{
-    string bbc_test = "[b]Hello![/b]";
+    string bbc_test = "[b]Bold[/b][i]Italic[/i][s]Strike[/s][u]Underline[/u][e]Emphasis[/e][size=7]Small[/size][size=60]Big[/size]"
+                        + "\n[b][i][u]Bold Italic Underline[/u][/i][/b]";
     HtmlString bbc_res = BBCodeHelper.ParseBBode(bbc_test);
 }
 
