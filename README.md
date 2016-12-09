@@ -38,8 +38,6 @@ Early development. Nothing is remotely ready to use!
 - BBCode Parser
     - An engine to parse BBCode.
     - Supports an administrator-definable list of BBCodes, including a sample set that can be modified.
-    - In a simple user-friendly format, EG: `[b]{{TEXT:1}}[/b]` : `<b>{{1}}</b>` to convert BBCode bold to HTML bold.
-    - Reasonable limitations available. EG: for `[size={{INTEGER(7,60):1}}]{{TEXT:2}}[/size]` as a basis for font sizes, limited to be between 1 and 7, and only integer typed.
 - Forum
     - Index
         - Display a list of all sections.
