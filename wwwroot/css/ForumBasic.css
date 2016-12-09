@@ -99,7 +99,15 @@ code
 }
 .emphasis
 {
-    font-size: 115%;
+    font-size: 17px;
     font-weight: bold;
     color: #FFFFFF;
+}
+.strike
+{
+    text-decoration: line-through;
+}
+.underline
+{
+    text-decoration: underline;
 }
