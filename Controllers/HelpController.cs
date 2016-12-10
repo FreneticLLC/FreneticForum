@@ -11,15 +11,14 @@ namespace FreneticForum.Controllers
     {
         public IActionResult Index()
         {
-            ViewData["init"] = new ForumInit(Request);
+            ViewData["init"] = new ForumInit(Request, Response);
             return View();
         }
 
         public IActionResult BBCodeTester()
         {
-            bool isPost = Request.Method.ToUpperInvariant() == "POST";
-            ViewData["is_post"] = isPost;
-            ViewData["init"] = new ForumInit(Request);
+            ViewData["is_post"] = Request.Method.ToUpperInvariant() == "POST";
+            ViewData["init"] = new ForumInit(Request, Response);
             return View();
         }
     }

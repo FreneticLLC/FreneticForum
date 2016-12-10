@@ -58,11 +58,34 @@ namespace FreneticForum.Models
 
         public HttpRequest Request;
 
+        public HttpResponse Response;
+
         public Account User = null;
 
-        public ForumInit(HttpRequest htr)
+        public LoginResult AttemptLogin(string username, string password, string tfa)
+        {
+            Account acc = Database.GetAccount(username);
+            if (acc == null)
+            {
+                return LoginResult.MISSING;
+            }
+            LoginResult res = acc.CanLogin(password, tfa);
+            if (res != LoginResult.ALLOWED)
+            {
+                return res;
+            }
+            CookieOptions co_uid = new CookieOptions();
+            co_uid.HttpOnly = true; // NOTE: Microsoft HttpOnly documentation appears to be backwards?
+            co_uid.Expires = DateTimeOffset.Now.AddYears(1);
+            Response.Cookies.Append("session_uid", acc.UserID.ToString(), co_uid);
+            Response.Cookies.Append("session_val", acc.GenerateSession(), co_uid);
+            return LoginResult.ALLOWED;
+        }
+
+        public ForumInit(HttpRequest htr, HttpResponse hres)
         {
             Request = htr;
+            Response = hres;
             Config = GetConfig();
             if (Config == null || Config.Count == 0)
             {

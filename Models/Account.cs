@@ -47,24 +47,46 @@ namespace FreneticForum.Models
             return UserBase.Find(fd).Project(proj).FirstOrDefaultAsync().Result;
         }
 
-        public LoginResult CanLogin(string pw)
+        public string GenerateSession()
+        {
+            string sess = ForumUtilities.GetRandomHex(32);
+            FilterDefinition<BsonDocument> fd = Builders<BsonDocument>.Filter.Eq(UID, UserID);
+            UpdateDefinition<BsonDocument> ud = Builders<BsonDocument>.Update.AddToSet("websess_codes", sess);
+            FindOneAndUpdateOptions<BsonDocument> foauo = new FindOneAndUpdateOptions<BsonDocument>();
+            foauo.IsUpsert = true;
+            UserBase.FindOneAndUpdate(fd, ud, foauo);
+            return sess;
+        }
+
+        public LoginResult CanLogin(string pw, string tfa)
         {
             BsonDocument acc = Projected(PASSWORD, BANNED);
             if (acc == null)
             {
                 return LoginResult.MISSING;
             }
-            if ((bool)acc[BANNED])
+            if (acc[BANNED].AsBoolean)
             {
                 return LoginResult.BANNED;
             }
-            string hash = ForumUtilities.Hash(pw, UserName);
-            byte[] b1 = ForumUtilities.Enc.GetBytes(hash);
-            byte[] b2 = ForumUtilities.Enc.GetBytes((string)acc[PASSWORD]);
-            if (!ForumUtilities.SlowEquals(b1, b2))
+            string opass = acc[PASSWORD].AsString;
+            string[] dat = opass.Split(':');
+            if (dat[0] == "v2")
             {
+                string hash = ForumUtilities.HashV2(pw, UserName, dat[1]);
+                byte[] b1 = ForumUtilities.Enc.GetBytes(hash);
+                byte[] b2 = ForumUtilities.Enc.GetBytes(opass);
+                if (!ForumUtilities.SlowEquals(b1, b2))
+                {
+                    return LoginResult.BAD_PASSWORD;
+                }
+            }
+            else
+            {
+                // TODO: Error?
                 return LoginResult.BAD_PASSWORD;
             }
+            // TODO: TFA Check
             return LoginResult.ALLOWED;
         }
     }
@@ -74,6 +96,7 @@ namespace FreneticForum.Models
         ALLOWED = 0,
         BANNED = 1,
         BAD_PASSWORD = 2,
-        MISSING = 3
+        MISSING = 3,
+        BAD_TFA = 4
     }
 }

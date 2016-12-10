@@ -37,6 +37,7 @@ The below is the full configuration for installation of the FreneticForum.
                     db.InstallAll(admin_pw, title, mainurl);
                     ForumInit.SaveNewConfig(dburl, dbname);
                     ((HttpResponse)ViewData["response"]).Redirect("/");
+                    return;
                 }
                 catch (Exception ex)
                 {

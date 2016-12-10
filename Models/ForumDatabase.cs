@@ -18,6 +18,7 @@ namespace FreneticForum.Models
         public string[] TFS = new string[] { TF_USERS, TF_SETTINGS, TF_SECTIONS, TF_TOPICS, TF_POSTS };
 
         public string[] TFS_WITH_UIDS = new string[] { TF_USERS, TF_SECTIONS, TF_TOPICS, TF_POSTS };
+        
         public MongoClient Client;
 
         public IMongoDatabase Database;

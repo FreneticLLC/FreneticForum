@@ -84,6 +84,8 @@ Early development. Nothing is remotely ready to use!
     - Also has: `banned` (bool), `banned_until` (date string), `ban_reason` (string)
     - Also has: `active` (bool), `activation_code` (string)
     - Also has: `register_date` (date string), `last_login_date` (date string)
+    - Also has: `tfa_active` (bool), `tfa_secret` (string)
+    - Also has: `websess_codes` (array of strings)
 - tf_settings
     - Index on: `name` (string)
     - Also has: `value` (string)

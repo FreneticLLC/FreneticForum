@@ -11,13 +11,13 @@ namespace FreneticForum.Controllers
     {
         public IActionResult ErrorInternal()
         {
-            ViewData["init"] = new ForumInit(Request);
+            ViewData["init"] = new ForumInit(Request, Response);
             return View();
         }
 
         public IActionResult Error404()
         {
-            ViewData["init"] = new ForumInit(Request);
+            ViewData["init"] = new ForumInit(Request, Response);
             return View();
         }
 
@@ -26,7 +26,7 @@ namespace FreneticForum.Controllers
             // Somewhat special case: Redirect to install page if not installed!
             try
             {
-                ViewData["init"] = new ForumInit(Request);
+                ViewData["init"] = new ForumInit(Request, Response);
                 return View();
             }
             catch (InitFailedException)
@@ -41,7 +41,7 @@ namespace FreneticForum.Controllers
             // SUPER SPECIAL CASE: Install page is only valid IF regular pages ARE NOT!
             try
             {
-                ForumInit init = new ForumInit(Request);
+                ForumInit init = new ForumInit(Request, Response);
                 Response.Redirect("/");
                 return new EmptyResult();
             }

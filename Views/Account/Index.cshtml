@@ -21,13 +21,13 @@
     }
     if (account == null)
     {
-        ViewData["Title"] = "Unknown Account | Account System";
+        ViewData["Title"] = "Unknown Account | Accounts";
         <p>Unknown Account Specified!</p>
         return;
     }
     else
     {
-        ViewData["Title"] = "Account: " + account.UserName + " | Account System";
+        ViewData["Title"] = "Account: " + account.UserName + " | Accounts";
     }
     BsonDocument doc = account.Projected(Account.REGISTER_DATE, Account.LAST_LOGIN_DATE, Account.DISPLAY_NAME, Account.ACTIVE, Account.BANNED);
 }
