@@ -18,6 +18,9 @@ Early development. Nothing is remotely ready to use!
 
 - Create, setup, and reasonably secure a MongoDB server instance.
     - You will need a (non-admin) user with `readWrite` access to a single db.
+- Install .NET Core CLI.
+- Download this source repository, open a command line to its directory, restore associated data (`dotnet restore`) and run it (call `development.bat` or `start.bat`).
+    - Currently launch scripts are provided only for Windows (`.bat`), but they are short and easily to translate to alternate platforms as needed. Linux launch scripts (`.sh`) may be provided in the future.
 - Connect to the server in the path its at (Server URL, or `localhost` with port `8050` by default) to be automatically directed to the install page.
     - Make sure config file folder is editable by the server process user. (Defaults to local path, `./FreneticForum/`)
     - To change your config file folder location, edit the marked variable near the top of `ForumInit.cs`.
