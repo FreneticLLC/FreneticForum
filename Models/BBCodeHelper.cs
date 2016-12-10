@@ -19,13 +19,13 @@ namespace FreneticForum.Models
             list.Add(new BBCode("b", "<b>", "</b>", "Bold Text"));
             list.Add(new BBCode("i", "<i>", "</i>", "Italic Text"));
             list.Add(new BBCode("e", "<span class=\"emphasis\">", "</span>", "Emphasized Text"));
-            list.Add(new BBCode("c", "<code>", "</code>", "In-Line Code Block", true));
+            list.Add(new BBCode("c", "<code>", "</code>", "In-Line Code Block", "", true));
             list.Add(new BBCode("s", "<span class=\"strike\">", "</span>", "Strike-Through Text"));
             list.Add(new BBCode("u", "<span class=\"underline\">", "</span>", "Underlined Text"));
             list.Add(new BBCode("*", ForumUtilities.BULLET.ToString(), "", "List Entry"));
-            list.Add(new BBCode("size", "<span style=\"font-size:{{VALUE}}px;\">", "</span>", "Resized Text (value from 7 to 60)") { Low = 7, High = 60 });
-            list.Add(new BBCode("url", "<a href=\"{{VALUE}}\">", "</a>", "Web Link (http(s):// required!)") { Validator = "^https?://.*$" });
-            list.Add(new BBCode("code", "<pre>", "</pre>", "Code Block", true) { NoPrecedingNewline = true });
+            list.Add(new BBCode("size", "<span style=\"font-size:{{VALUE}}px;\">", "</span>", "Resized Text", "VALUE{7-60}") { Low = 7, High = 60 });
+            list.Add(new BBCode("url", "<a href=\"{{VALUE}}\">", "</a>", "Web Link", "http(s)://LINK_HERE") { Validator = "^https?://.*$" });
+            list.Add(new BBCode("code", "<pre>", "</pre>", "Code Block", "", true) { NoPrecedingNewline = true });
             return list;
         }
 
@@ -43,7 +43,9 @@ namespace FreneticForum.Models
             StringBuilder res = new StringBuilder();
             for (int i = 0; i < codes.Count; i++)
             {
-                res.Append("<div class=\"blockify\"><code>[" + codes[i].BBC + "]" + codes[i].Help + "[/" + codes[i].BBC + "]</code></div>");
+                res.Append("<div class=\"blockify\"><code>[" + codes[i].BBC
+                + (string.IsNullOrWhiteSpace(codes[i].ValueHelp) ? "" : "=" + codes[i].ValueHelp)
+                + "]" + codes[i].Help + "[/" + codes[i].BBC + "]</code></div>");
                 if (i + 1 < codes.Count)
                 {
                     res.Append(", ");
@@ -217,6 +219,8 @@ namespace FreneticForum.Models
 
         public string Help;
 
+        public string ValueHelp;
+
         public bool Plainify;
 
         public int Low = -1;
@@ -235,12 +239,13 @@ namespace FreneticForum.Models
             }
         }
 
-        public BBCode(string _bbc, string _htmlpre, string _htmlsuf, string _help, bool _plainify = false)
+        public BBCode(string _bbc, string _htmlpre, string _htmlsuf, string _help, string vhelp = "", bool _plainify = false)
         {
             BBC = _bbc;
             HTMLPrefix = _htmlpre;
             HTMLSuffix = _htmlsuf;
             Help = _help;
+            ValueHelp = vhelp;
             Plainify = _plainify;
         }
     }
