@@ -11,7 +11,7 @@ namespace FreneticForum.Models
     public class ForumInit
     {
         // ----------------------------- EDIT BELOW ------------------------ //
-        public const string CONFIG_FILE_FOLDER_LOCATION = "./FreneticForum/";
+        public const string CONFIG_FILE_FOLDER_LOCATION = "./config/";
         // ----------------------------- EDIT ABOVE ------------------------- //
 
         public const string CONFIG_FILE_LOCATION = CONFIG_FILE_FOLDER_LOCATION + "FreneticForum.cfg";
