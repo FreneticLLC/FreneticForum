@@ -11,14 +11,28 @@ namespace FreneticForum.Controllers
     {
         public IActionResult ErrorInternal()
         {
-            ViewData["init"] = new ForumInit(Request, Response);
-            return View();
+            try
+            {
+                ViewData["init"] = new ForumInit(Request, Response);
+                return View();
+            }
+            catch (NoProcessException)
+            {
+                return new EmptyResult();
+            }
         }
 
         public IActionResult Error404()
         {
-            ViewData["init"] = new ForumInit(Request, Response);
-            return View();
+            try
+            {
+                ViewData["init"] = new ForumInit(Request, Response);
+                return View();
+            }
+            catch (NoProcessException)
+            {
+                return new EmptyResult();
+            }
         }
 
         public IActionResult Index()
@@ -28,6 +42,10 @@ namespace FreneticForum.Controllers
             {
                 ViewData["init"] = new ForumInit(Request, Response);
                 return View();
+            }
+            catch (NoProcessException)
+            {
+                return new EmptyResult();
             }
             catch (InitFailedException)
             {
@@ -43,6 +61,10 @@ namespace FreneticForum.Controllers
             {
                 ForumInit init = new ForumInit(Request, Response);
                 Response.Redirect("/");
+                return new EmptyResult();
+            }
+            catch (NoProcessException)
+            {
                 return new EmptyResult();
             }
             catch (InitFailedException)

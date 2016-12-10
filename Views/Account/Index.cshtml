@@ -19,6 +19,10 @@
     {
         account = init.Database.GetAccount(uidc);
     }
+    if (account == null && uidQuery == null && usernameQuery == null)
+    {
+        account = init.User;
+    }
     if (account == null)
     {
         ViewData["Title"] = "Unknown Account | Accounts";

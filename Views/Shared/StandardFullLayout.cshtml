@@ -34,7 +34,10 @@
                 }
                 else
                 {
-                    <span>(Account Info Here)</span>
+                    HtmlString link = new HtmlString("<a href=\"/Account?user=" + init.User.UserName + "&uid=" + init.User.UserID + "\">"
+                        + init.User.UserName + "</a>");
+                    <span>Logged in as: @link
+                    <br><form id="logout" method="POST"><input type="hidden" name="mode" value="LOGOUT_NOW" /><input type="submit" value="Logout" /></form></span>
                 }
             </div>
         </div>

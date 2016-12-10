@@ -82,6 +82,20 @@ namespace FreneticForum.Models
             return LoginResult.ALLOWED;
         }
 
+        public Account TrySession(long uid, string sess)
+        {
+            Account acc = Database.GetAccount(uid);
+            if (acc == null)
+            {
+                return null;
+            }
+            if (!acc.TrySession(sess))
+            {
+                return null;
+            }
+            return acc;
+        }
+
         public ForumInit(HttpRequest htr, HttpResponse hres)
         {
             Request = htr;
@@ -94,6 +108,24 @@ namespace FreneticForum.Models
             else
             {
                 Database = new ForumDatabase(Config["database_path"], Config["database_db"]);
+            }
+            if (Request.Cookies.ContainsKey("session_uid") && Request.Cookies.ContainsKey("session_val"))
+            {
+                string suid = Request.Cookies["session_uid"];
+                string sval = Request.Cookies["session_val"];
+                long t;
+                if (long.TryParse(suid, out t))
+                {
+                    User = TrySession(t, sval);
+                }
+            }
+            if (User != null && Request.Method == "POST" && Request.Form.ContainsKey("mode") && Request.Form["mode"].ToString() == "LOGOUT_NOW")
+            {
+                User.ClearSessions();
+                Response.Cookies.Delete("session_uid");
+                Response.Cookies.Delete("session_val");
+                Response.Redirect("/");
+                throw new NoProcessException();
             }
         }
     }

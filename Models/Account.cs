@@ -21,6 +21,7 @@ namespace FreneticForum.Models
         public const string PASSWORD = "password";
         public const string USERNAME = "username";
         public const string UID = "uid";
+        public const string WEBSESS_CODES = "websess_codes";
 
         
         public string UserName;
@@ -47,15 +48,32 @@ namespace FreneticForum.Models
             return UserBase.Find(fd).Project(proj).FirstOrDefaultAsync().Result;
         }
 
+        public bool TrySession(string sess)
+        {
+            FilterDefinition<BsonDocument> fd = Builders<BsonDocument>.Filter.Eq(UID, UserID);
+            FilterDefinition<BsonDocument> fd_valids = Builders<BsonDocument>.Filter.AnyEq(WEBSESS_CODES, sess);
+            FilterDefinition<BsonDocument> both = fd & fd_valids;
+            return UserBase.Find(both).CountAsync().Result > 0;
+        }
+
         public string GenerateSession()
         {
             string sess = ForumUtilities.GetRandomHex(32);
             FilterDefinition<BsonDocument> fd = Builders<BsonDocument>.Filter.Eq(UID, UserID);
-            UpdateDefinition<BsonDocument> ud = Builders<BsonDocument>.Update.AddToSet("websess_codes", sess);
+            UpdateDefinition<BsonDocument> ud = Builders<BsonDocument>.Update.AddToSet(WEBSESS_CODES, sess);
             FindOneAndUpdateOptions<BsonDocument> foauo = new FindOneAndUpdateOptions<BsonDocument>();
             foauo.IsUpsert = true;
             UserBase.FindOneAndUpdate(fd, ud, foauo);
             return sess;
+        }
+
+        public void ClearSessions()
+        {
+            FilterDefinition<BsonDocument> fd = Builders<BsonDocument>.Filter.Eq(UID, UserID);
+            UpdateDefinition<BsonDocument> ud = Builders<BsonDocument>.Update.Unset(WEBSESS_CODES);
+            FindOneAndUpdateOptions<BsonDocument> foauo = new FindOneAndUpdateOptions<BsonDocument>();
+            foauo.IsUpsert = true;
+            UserBase.FindOneAndUpdate(fd, ud, foauo);
         }
 
         public LoginResult CanLogin(string pw, string tfa)
