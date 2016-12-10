@@ -130,7 +130,7 @@ namespace FreneticForum.Models
             user[Account.USERNAME] = "admin";
             user[Account.DISPLAY_NAME] = "Administrator";
             user[Account.PASSWORD] = ForumUtilities.Hash(pw, "admin");
-            user[Account.PASSWORD] = true;
+            user[Account.ACTIVE] = true;
             FilterDefinition<BsonDocument> fd = Builders<BsonDocument>.Filter.Eq(Account.UID, (long)0);
             UpdateOptions uo = new UpdateOptions() { IsUpsert = true };
             userbase.ReplaceOneAsync(fd, user, uo).Wait();
