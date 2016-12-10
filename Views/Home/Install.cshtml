@@ -26,14 +26,22 @@ The below is the full configuration for installation of the FreneticForum.
             }
             else if (!mainurl.Contains("."))
             {
-                info = "<b>EROR</B>: Failed, invalid URL specification!";
+                info = "<b>ERROR</b>: Failed, invalid URL specification!";
             }
             else
             {
-                ForumDatabase db = new ForumDatabase(dburl, dbname);
-                db.InstallAll(admin_pw, title, mainurl);
-                ForumInit.SaveNewConfig(dburl, dbname);
-                ((HttpResponse)ViewData["response"]).Redirect("/");
+                try
+                {
+                    ForumInit.SaveTestConfig();
+                    ForumDatabase db = new ForumDatabase(dburl, dbname);
+                    db.InstallAll(admin_pw, title, mainurl);
+                    ForumInit.SaveNewConfig(dburl, dbname);
+                    ((HttpResponse)ViewData["response"]).Redirect("/");
+                }
+                catch (Exception ex)
+                {
+                    info = "<b>ERROR</b>: Internal exception while installing: " + ex.ToString().Replace("&", "&amp;").Replace("<", "&lt;").Replace(">", "&gt;");
+                }
             }
         }
         else
@@ -42,6 +50,8 @@ The below is the full configuration for installation of the FreneticForum.
         }
     }
 }
+
+<br>@Html.Raw(info)
 
 <form id="Submitto" method="POST">
     <br><span class="emphasis">Forum Name</span>
@@ -73,5 +83,3 @@ The below is the full configuration for installation of the FreneticForum.
     <br><input type="password" name="admin_password" value="" class="wide_input_box" />
     <br><input type="submit" value="Install FreneticForum!"/>
 </form>
-
-<br>@Html.Raw(info)
