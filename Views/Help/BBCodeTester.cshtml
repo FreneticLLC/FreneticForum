@@ -1,0 +1,27 @@
+@{
+    ViewData["Title"] = "BBCodeTester | Forum Help";
+    ForumInit init = (ForumInit)ViewData["init"];
+}
+
+@{
+    HtmlString res = new HtmlString("Results Will Go Here");
+    string original = "";
+    if ((bool)ViewData["is_post"])
+    {
+        original = init.Request.Form["bbcode"].ToString();
+        res = BBCodeHelper.ParseBBode(original);
+    }
+}
+
+Results:
+<br><hr>
+@res
+<br>
+@ForumUtilities.SECTION_SEPARATOR
+
+@BBCodeHelper.BBCodeInfo()
+
+<form id="testdata" method="POST">
+    <br><textarea name="bbcode" cols="40" rows="10">@original</textarea>
+    <br><input type="submit" value="Test BBCode"/>
+</form>

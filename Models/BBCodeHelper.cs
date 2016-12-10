@@ -19,19 +19,41 @@ namespace FreneticForum.Models
             list.Add(new BBCode("b", "<b>", "</b>", "Bold Text"));
             list.Add(new BBCode("i", "<i>", "</i>", "Italic Text"));
             list.Add(new BBCode("e", "<span class=\"emphasis\">", "</span>", "Emphasized Text"));
-            list.Add(new BBCode("c", "<code>", "</code>", "Code Block", true));
+            list.Add(new BBCode("c", "<code>", "</code>", "In-Line Code Block", true));
             list.Add(new BBCode("s", "<span class=\"strike\">", "</span>", "Strike-Through Text"));
             list.Add(new BBCode("u", "<span class=\"underline\">", "</span>", "Underlined Text"));
+            list.Add(new BBCode("*", ForumUtilities.BULLET.ToString(), "", "List Entry"));
             list.Add(new BBCode("size", "<span style=\"font-size:{{VALUE}}px;\">", "</span>", "Resized Text (value from 7 to 60)") { Low = 7, High = 60 });
+            list.Add(new BBCode("url", "<a href=\"{{VALUE}}\">", "</a>", "Web Link (http(s):// required!)") { Validator = "^https?://.*$" });
+            list.Add(new BBCode("code", "<pre>", "</pre>", "Code Block", true) { NoPrecedingNewline = true });
             return list;
         }
 
-        public static List<BBCode> BBCodesKnown = null; // TODO: Dictionary?
+        public static List<BBCode> BBCodesKnown = null;
 
         public static List<BBCode> ActualBBCodes()
         {
             // TODO: write to and read from database.
             return BBCodesKnown ?? (BBCodesKnown = GetDefaultBBCodes());
+        }
+
+        public static HtmlString BBCodeInfo()
+        {
+            List<BBCode> codes = ActualBBCodes();
+            StringBuilder res = new StringBuilder();
+            for (int i = 0; i < codes.Count; i++)
+            {
+                res.Append("<div class=\"blockify\"><code>[" + codes[i].BBC + "]" + codes[i].Help + "[/" + codes[i].BBC + "]</code></div>");
+                if (i + 1 < codes.Count)
+                {
+                    res.Append(", ");
+                }
+                else
+                {
+                    res.Append(".");
+                }
+            }
+            return new HtmlString(res.ToString());
         }
 
         private static string BBC_Internal(List<BBCode> codes, string input, int depth = 0)
@@ -100,6 +122,10 @@ namespace FreneticForum.Models
                                         {
                                             innerData = BBC_Internal(codes, innerData, depth + 1);
                                         }
+                                        else
+                                        {
+                                            innerData = innerData.Replace("\n", "<{NOVERT}>");
+                                        }
                                         string repl = "";
                                         if (code.Low != -1 || code.High != -1)
                                         {
@@ -113,6 +139,14 @@ namespace FreneticForum.Models
                                                 outp = code.Low;
                                             }
                                             repl = outp.ToString();
+                                        }
+                                        else if (code.Validate != null)
+                                        {
+                                            if (!code.Validate.IsMatch(tag_value))
+                                            {
+                                                break;
+                                            }
+                                            repl = tag_value;
                                         }
                                         innerData = code.HTMLPrefix.Replace("{{VALUE}}", repl) + innerData + code.HTMLSuffix.Replace("{{VALUE}}", repl);
                                         break;
@@ -138,7 +172,7 @@ namespace FreneticForum.Models
                 }
                 res.Append(input[i]);
             }
-            return res.ToString().Replace("\n", "\n<br>");
+            return res.ToString();
             
         }
 
@@ -148,7 +182,22 @@ namespace FreneticForum.Models
             List<BBCode> codes = ActualBBCodes();
             try
             {
-                return new HtmlString(BBC_Internal(codes, input));
+                string outp = BBC_Internal(codes, input).Replace("\r", "");
+                while (outp.Contains("\n\n"))
+                {
+                    outp = outp.Replace("\n\n", "\n");
+                }
+                for (int i = 0; i < codes.Count; i++)
+                {
+                    if (codes[i].NoPrecedingNewline)
+                    {
+                        while (outp.Contains("\n" + codes[i].HTMLPrefix))
+                        {
+                            outp = outp.Replace("\n" + codes[i].HTMLPrefix, codes[i].HTMLPrefix);
+                        }
+                    }
+                }
+                return new HtmlString(outp.Replace("\n", "\n<br>").Replace("<{NOVERT}>", "\n"));
             }
             catch (Exception ex)
             {
@@ -173,6 +222,18 @@ namespace FreneticForum.Models
         public int Low = -1;
 
         public int High = -1;
+
+        public Regex Validate = null;
+
+        public bool NoPrecedingNewline = false;
+
+        public string Validator
+        {
+            set
+            {
+                Validate = new Regex(value, RegexOptions.Compiled);
+            }
+        }
 
         public BBCode(string _bbc, string _htmlpre, string _htmlsuf, string _help, bool _plainify = false)
         {

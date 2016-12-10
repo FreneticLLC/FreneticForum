@@ -110,5 +110,6 @@
   },
   "tooling": {
     "defaultNamespace": "WebApplication"
-  }
+  },
+  "exclude": "node_modules"
 }
