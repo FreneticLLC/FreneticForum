@@ -101,7 +101,7 @@ namespace FreneticForum.Models
             }
             else
             {
-                // TODO: Error?
+                // TODO: Error? "Invalid password for " + UserName + ": unrecognized version, they will be unable to login without a reset!"
                 return LoginResult.BAD_PASSWORD;
             }
             // TODO: TFA Check
