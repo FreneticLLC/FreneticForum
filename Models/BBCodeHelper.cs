@@ -18,6 +18,7 @@ namespace FreneticForum.Models
             List<BBCode> list = new List<BBCode>();
             list.Add(new BBCode("b", "<b>", "</b>", "Bold Text"));
             list.Add(new BBCode("i", "<i>", "</i>", "Italic Text"));
+            list.Add(new BBCode("hr", "<hr>", "", "Horizontal Line"));
             list.Add(new BBCode("e", "<span class=\"emphasis\">", "</span>", "Emphasized Text"));
             list.Add(new BBCode("c", "<code>", "</code>", "In-Line Code Block", "", true));
             list.Add(new BBCode("s", "<span class=\"strike\">", "</span>", "Strike-Through Text"));
@@ -115,7 +116,6 @@ namespace FreneticForum.Models
                             if (selfs == 0)
                             {
                                 string innerData = content.ToString();
-                                Console.WriteLine("Tag " + tag_id + " with innards: " + innerData);
                                 foreach (BBCode code in codes)
                                 {
                                     if (code.BBC == tag_id)
