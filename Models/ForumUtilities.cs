@@ -86,6 +86,13 @@ namespace FreneticForum.Models
         public static RandomNumberGenerator rng = RandomNumberGenerator.Create();
         public static MD5 md5 = MD5.Create();
 
+        public static string GetRandomB64(int len = 32)
+        {
+            byte[] data = new byte[len];
+            rng.GetBytes(data);
+            return Convert.ToBase64String(data);
+        }
+
         public static string GetRandomHex(int len = 64)
         {
             byte[] data = new byte[len];

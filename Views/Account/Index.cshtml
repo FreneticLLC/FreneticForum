@@ -41,6 +41,7 @@
     <tr><td>User-ID</td><td>@account.UserID</td></tr>
     <tr><td>Registered</td><td>@doc[Account.REGISTER_DATE]</td></tr>
     <tr><td>Last Login Date</td><td>@doc[Account.LAST_LOGIN_DATE]</td></tr>
-    <tr><td>Active?</td><td>@doc[Account.ACTIVE]</td></tr>
-    <tr><td>Banned?</td><td>@doc[Account.BANNED]</td></tr>
+    <tr><td>Account considered active?</td><td>@doc[Account.ACTIVE]</td></tr>
+    <tr><td>Account is banned?</td><td>@doc[Account.BANNED]</td></tr>
+    <tr><td>Uses <a href="/Account/GetTFA">TFA</a>?</td><td>@account.UsesTFA()</td></tr>
 </table>

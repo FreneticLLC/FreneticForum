@@ -10,7 +10,7 @@ namespace FreneticForum.Models
 {
     public class ForumInit
     {
-        // ----------------------------- EDIT BELOW ------------------------ //
+        // ----------------------------- EDIT BELOW ------------------------- //
         public const string CONFIG_FILE_FOLDER_LOCATION = "./config/";
         // ----------------------------- EDIT ABOVE ------------------------- //
 
@@ -61,6 +61,11 @@ namespace FreneticForum.Models
         public HttpResponse Response;
 
         public Account User = null;
+
+        public bool IsGuest()
+        {
+            return User == null || User.GetActType() != Account.AT_VALID;
+        }
 
         public LoginResult AttemptLogin(string username, string password, string tfa)
         {

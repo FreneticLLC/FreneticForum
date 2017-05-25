@@ -1,0 +1,120 @@
+@{
+    ForumInit init = (ForumInit)ViewData["init"];
+    ViewData["Title"] = "Get TFA | Accounts";
+}
+
+@{
+    if (init.IsGuest())
+    {
+        <span>
+            Two-Factor Authentication is a login security technique. To add TFA via Google Authenticator to your account, please <a href="/Account/Login">log in</a>!
+        </span>
+        return;
+    }
+    if (init.User.UsesTFA())
+    {
+        if ((bool)ViewData["is_post"] && init.Request.Form["mode"].ToString() == "disable_tfa")
+        {
+            string password = init.Request.Form["password"].ToString();
+            if (password == null || init.User.CanLogin(password, "", false) != LoginResult.ALLOWED)
+            {
+                <span>
+                    Invalid password!
+                </span>
+                return;
+            }
+            init.User.DisableTFA();
+            <span>
+                TFA disabled. Reopen the GetTFA page to re-enable it!
+            </span>
+            return;
+        }
+        if ((bool)ViewData["is_post"] && init.Request.Form["mode"].ToString() == "get_codes")
+        {
+            string password = init.Request.Form["password"].ToString();
+            if (password == null || init.User.CanLogin(password, "", false) != LoginResult.ALLOWED)
+            {
+                <span>
+                    Invalid password!
+                </span>
+                return;
+            }
+            <span>
+                TFA backup codes: @init.User.GetBackups().Replace("|", ", ")
+            </span>
+            return;
+        }
+        <span>
+            Thank you for using TFA!
+            <br>To get your backup codes, fill the form below:
+            <form id="get_codes" method="POST">
+                <input type="hidden" name="mode" value="get_codes" />
+                <br><span class="emphasis">Password</span>
+                <br>Your password as the system currently knows it.
+                <br><input type="password" name="password" value="" class="wide_input_box" />
+                <br><input type="submit" value="Backup Codes" />
+            </form>
+            <br>To disable TFA for your account, fill the form below:
+            <form id="tfa_disable" method="POST">
+                <input type="hidden" name="mode" value="disable_tfa" />
+                <br><span class="emphasis">Password</span>
+                <br>Your password as the system currently knows it.
+                <br><input type="password" name="password" value="" class="wide_input_box" />
+                <br><input type="submit" value="Remove TFA" />
+            </form>
+        </span>
+        return;
+    }
+    string info = "";
+    if ((bool)ViewData["is_post"])
+    {
+        string password = init.Request.Form["password"].ToString();
+        string tfa = init.Request.Form["tfa"].ToString();
+        if (password != null && tfa != null)
+        {
+            if (init.User.CanLogin(password, "", false) != LoginResult.ALLOWED)
+            {
+                info = "<b>ERROR</b>: Failed, wrong username!";
+            }
+            else if (!init.User.CheckTFA(tfa))
+            {
+                info = "<b>ERROR</b>: TFA code was wrong!";
+            }
+            else
+            {
+                init.User.EnableTFA();
+                <span>
+                    TFA has been enabled!
+                </span>
+                return;
+            }
+        }
+        else
+        {
+            info = "<b>ERROR</b>: Failed, null inputs!";
+        }
+    }
+    SetupCode tfasc = init.User.GenerateTFA();
+}
+
+<br>@Html.Raw(info)
+
+<br>
+<br>@tfasc.Account
+<br>Using Google Authenticator,
+<br>Scan this code:
+<br><img src="@tfasc.QrCodeSetupImageUrl" />
+<br>Or enter this key:
+<br>@tfasc.ManualEntryKey
+<br>
+
+<form id="tfa_enable" method="POST">
+    <input type="hidden" id="mode" value="enable_tfa" />
+    <br><span class="emphasis">Password</span>
+    <br>Your password as the system currently knows it.
+    <br><input type="password" name="password" value="" class="wide_input_box" />
+    <br><span class="emphasis">Two Factor Authentication</span>
+    <br>If you have TFA configured on your account, read the most current code from your TFA app and input it below.
+    <br><input type="text" name="tfa" value="" class="wide_input_box" />
+    <br><input type="submit" value="Login" />
+</form>

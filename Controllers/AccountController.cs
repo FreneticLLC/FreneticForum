@@ -35,5 +35,19 @@ namespace FreneticForum.Controllers
                 return new EmptyResult();
             }
         }
+
+        public IActionResult GetTFA()
+        {
+            try
+            {
+                ViewData["init"] = new ForumInit(Request, Response);
+                ViewData["is_post"] = Request.Method.ToUpperInvariant() == "POST";
+                return View();
+            }
+            catch (NoProcessException)
+            {
+                return new EmptyResult();
+            }
+        }
     }
 }

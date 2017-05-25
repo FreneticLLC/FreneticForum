@@ -108,6 +108,11 @@ namespace FreneticForum.Models
             user[Account.ACTIVATION_CODE] = "<Unusable>?";
             user[Account.REGISTER_DATE] = ForumUtilities.DateNow();
             user[Account.LAST_LOGIN_DATE] = "Never";
+            user[Account.USES_TFA] = false;
+            user[Account.TFA_BACKUPS] = "";
+            user[Account.TFA_INTERNAL] = "";
+            user[Account.ACCOUNT_TYPE] = Account.AT_INCOMPLETE;
+            user[Account.ROLES] = new BsonArray(new BsonValue[] { });
             return user;
         }
 
@@ -132,6 +137,7 @@ namespace FreneticForum.Models
             user[Account.DISPLAY_NAME] = "Administrator";
             user[Account.PASSWORD] = ForumUtilities.Hash(pw, "admin");
             user[Account.ACTIVE] = true;
+            user[Account.ACCOUNT_TYPE] = Account.AT_VALID;
             FilterDefinition<BsonDocument> fd = Builders<BsonDocument>.Filter.Eq(Account.UID, (long)0);
             UpdateOptions uo = new UpdateOptions() { IsUpsert = true };
             userbase.ReplaceOneAsync(fd, user, uo).Wait();
