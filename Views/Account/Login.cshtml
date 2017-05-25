@@ -4,6 +4,13 @@
 }
 
 @{
+    if (!init.IsGuest())
+    {
+        <span>
+            You're already logged in!
+        </span>
+        return;
+    }
     string info = "";
     if ((bool)ViewData["is_post"])
     {

@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using System.IO;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
+using MongoDB.Bson;
+using MongoDB.Driver;
 
 namespace FreneticForum.Models
 {
@@ -79,6 +81,7 @@ namespace FreneticForum.Models
             {
                 return res;
             }
+            acc.Update(Builders<BsonDocument>.Update.Set(Account.LAST_LOGIN_DATE, ForumUtilities.DateNow()));
             CookieOptions co_uid = new CookieOptions();
             co_uid.HttpOnly = true; // NOTE: Microsoft HttpOnly documentation appears to be backwards?
             co_uid.Expires = DateTimeOffset.Now.AddYears(1);
