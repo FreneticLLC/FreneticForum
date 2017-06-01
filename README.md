@@ -21,6 +21,7 @@ Early development. Nothing is remotely ready to use!
 - Install .NET Core CLI.
 - Install NPM (Node Package Manager).
 - Install NPM package `gulp` and related (at a command line, `npm install gulp rimraf gulp-concat gulp-cssmin gulp-uglify gulp-rename`)
+- Probably blacklist the launch port (which is `8050` by default) to be disallowed for everyone but you - for safety during the setup phase.
 - Download this source repository, open a command line to its directory, restore associated data (run `dotnet restore`) and run it (run `development.bat` or `start.bat`).
     - Currently launch scripts are provided only for Windows (`.bat`), but they are short and easily to translate to alternate platforms as needed. Linux launch scripts (`.sh`) may be provided in the future.
 - Connect to the server in the path its at (Server URL (or `localhost`), with port `8050` by default) to be automatically directed to the install page.
@@ -30,6 +31,7 @@ Early development. Nothing is remotely ready to use!
 - You can log in as `admin` with the password you gave on the install page.
 - It is recommended at this point that you register yourself a separate account, and give it admin access of its own, so that you are not logging in as the root admin normally.
 - Configure the forum however you wish via the administrative control panel.
+- If you blacklisted the launch port, at this point remove that blacklisting.
 - Invite some users and start posting!
 
 ### Plan / Outline
