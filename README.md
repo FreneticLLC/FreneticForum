@@ -32,6 +32,7 @@ Early development. Nothing is remotely ready to use!
 - It is recommended at this point that you register yourself a separate account, and give it admin access of its own, so that you are not logging in as the root admin normally.
 - Configure the forum however you wish via the administrative control panel.
 - If you blacklisted the launch port, at this point remove that blacklisting.
+- Optionally, use apache or similar as a mid-point for connections.
 - Invite some users and start posting!
 
 ### Plan / Outline
@@ -41,6 +42,7 @@ Early development. Nothing is remotely ready to use!
 - Account System
     - A simple Collection of users, stored as documents.
     - A full account management setup with registration, login, logout, etc.
+    - Usable as a generic account-server.
     - Semi-relational data, not all dumped into the user document.
 - BBCode Parser
     - An engine to parse BBCode.
@@ -74,7 +76,7 @@ Early development. Nothing is remotely ready to use!
     - Moderator Panel
         - Control over and information on user activities (EG reports).
     - User Control Panel
-        - Good level of control for a user over their own account.
+        - Good level of control for a user over their own account, alongside basic settings such as board theme.
     - User Private Messaging (PM) Service
         - Way for users to contact each other.
 
@@ -86,7 +88,8 @@ Early development. Nothing is remotely ready to use!
     - Also has: `banned` (bool), `banned_until` (date string), `ban_reason` (string)
     - Also has: `active` (bool), `activation_code` (string)
     - Also has: `register_date` (date string), `last_login_date` (date string)
-    - Also has: `tfa_active` (bool), `tfa_secret` (string)
+    - Also has: `uses_tfa` (bool), `tfa_internal` (string), `tfa_backups` (string)
+    - Also has: `account_type` (int32), `roles` (array of strings)
     - Also has: `websess_codes` (array of strings)
 - tf_settings
     - Index on: `name` (string)
