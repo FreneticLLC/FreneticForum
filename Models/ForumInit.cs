@@ -24,12 +24,6 @@ namespace FreneticForum.Models
             File.WriteAllText(CONFIG_FILE_LOCATION, "database_path: " + dbpath + "\ndatabase_db: " + dbname + "\n");
         }
 
-        public static void SaveTestConfig()
-        {
-            Directory.CreateDirectory(CONFIG_FILE_FOLDER_LOCATION);
-            File.WriteAllText(CONFIG_FILE_LOCATION, "\n");
-        }
-
         public ForumDatabase Database;
 
         public Dictionary<string, string> Config;
@@ -129,7 +123,7 @@ namespace FreneticForum.Models
             }
             if (User != null && Request.Method == "POST" && Request.Form.ContainsKey("mode") && Request.Form["mode"].ToString() == "LOGOUT_NOW")
             {
-                User.ClearSessions();
+                User.ClearSessions(); // TODO: Remove current session only. Also, a profile button to clear-all.
                 Response.Cookies.Delete("session_uid");
                 Response.Cookies.Delete("session_val");
                 Response.Redirect("/");
