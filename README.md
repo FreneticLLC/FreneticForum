@@ -79,6 +79,9 @@ Early development. Nothing is remotely ready to use!
         - Good level of control for a user over their own account, alongside basic settings such as board theme.
     - User Private Messaging (PM) Service
         - Way for users to contact each other.
+- Other
+    - Simple 'pages builder'.
+        - A way to build generic web pages easily within the forum's domain.
 
 ### Database Outline
 
