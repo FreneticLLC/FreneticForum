@@ -1,6 +1,3 @@
-<!DOCTYPE html>
-<html>
-<head>
 @{
     ForumInit init = (ForumInit)ViewData["init"];
     string Title = "FreneticForum";
@@ -9,6 +6,9 @@
         Title = init.Database.GetSetting("title", Title);
     }
 }
+<!DOCTYPE html>
+<html>
+<head>
     <meta charset="utf-8" />
     <title>@ViewData["Title"] | @Title</title>
     <link rel="stylesheet" href="/css/ForumBasic.min.css?vary=1" type="text/css" />
