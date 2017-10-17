@@ -79,6 +79,12 @@ Early development. Nothing is remotely ready to use!
         - Good level of control for a user over their own account, alongside basic settings such as board theme.
     - User Private Messaging (PM) Service
         - Way for users to contact each other.
+- Other
+    - Simple 'pages builder'.
+        - A way to build generic web pages easily within the forum's domain.
+- Search Engine
+    - Maintain a mapping of keywords to posts
+        - IE, for each word in the post that should be validly searchable, set an indexed database key with that name to contain a reference ID of the post.
 
 ### Database Outline
 
@@ -104,6 +110,9 @@ Early development. Nothing is remotely ready to use!
 - tf_posts
     - Index on: `uid` (long)
     - Also has: `contents` (BBCode string), `author_uid` (long), `author_username` (string), `post_date` (date string)
+- tf_search
+    - Index on: `keyword` (string)
+    - Also has: `posts` (array of int32s)
 
 ### Random Concept Write-Ups
 
