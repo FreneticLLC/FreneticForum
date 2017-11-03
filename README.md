@@ -19,11 +19,10 @@ Early development. Nothing is remotely ready to use!
 - Create, setup, and reasonably secure a MongoDB server instance.
     - You will need a (non-admin) user with `readWrite` access to a single db.
 - Install .NET Core CLI.
-- Install NPM (Node Package Manager).
-- Install NPM package `gulp` and related (at a command line, `npm install gulp rimraf gulp-concat gulp-cssmin gulp-uglify gulp-rename`)
+- Install NPM (Node Package Manager, generally included with package labeled like `nodejs`, may require special install steps - google helps!).
+- Install NPM package `gulp` and related (at a command line, `npm install gulp rimraf gulp-concat gulp-cssmin gulp-uglify gulp-rename`).
 - Probably blacklist the launch port (which is `8050` by default) to be disallowed for everyone but you - for safety during the setup phase.
-- Download this source repository, open a command line to its directory, restore associated data (run `dotnet restore`) and run it (run `development.bat` or `start.bat`).
-    - Currently launch scripts are provided only for Windows (`.bat`), but they are short and easily to translate to alternate platforms as needed. Linux launch scripts (`.sh`) may be provided in the future.
+- Download this source repository, open a command line to its directory, restore associated data (run `dotnet restore`) and run it (run `development.bat` or `start.bat` / `start.sh`).
 - Connect to the server in the path its at (Server URL (or `localhost`), with port `8050` by default) to be automatically directed to the install page.
     - Make sure config file folder is editable by the server process user. (Defaults to local path, `./config/`)
     - To change your config file folder location, edit the marked variable near the top of `ForumInit.cs`.
