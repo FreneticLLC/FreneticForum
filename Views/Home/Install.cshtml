@@ -32,7 +32,7 @@ The below is the full configuration for installation of the FreneticForum.
             {
                 try
                 {
-                    ForumInit.SaveTestConfig();
+                    //ForumInit.SaveTestConfig();
                     ForumDatabase db = new ForumDatabase(dburl, dbname);
                     db.InstallAll(admin_pw, title, mainurl);
                     ForumInit.SaveNewConfig(dburl, dbname);
