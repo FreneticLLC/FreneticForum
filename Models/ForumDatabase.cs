@@ -230,7 +230,7 @@ namespace FreneticForum.Models
             {
                 return null;
             }
-            return new Account(userbase, (string)acc[Account.USERNAME], (long)acc[Account.UID]);
+            return new Account(userbase, (string)acc[Account.USERNAME], (long)acc[Account.UID]) { FData = this };
         }
 
         public Account GetAccount(long uid)
@@ -243,7 +243,7 @@ namespace FreneticForum.Models
             {
                 return null;
             }
-            return new Account(userbase, (string)acc[Account.USERNAME], (long)acc[Account.UID]);
+            return new Account(userbase, (string)acc[Account.USERNAME], (long)acc[Account.UID]) { FData = this };
         }
     }
 }

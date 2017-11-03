@@ -50,7 +50,7 @@ namespace FreneticForum.Controllers
             }
         }
 
-        public IActionResult API()
+        public IActionResult APIv1()
         {
             try
             {
@@ -68,31 +68,59 @@ namespace FreneticForum.Controllers
                 // Log in to an account
                 if (qtype == "login")
                 {
-                    // Username, Password, TFA
-                    return Content("ERROR=NOT_IMPLEMENTED;");
+                    // Username, Password, TFA, SType
+                    // Return session
+                    string username = Request.Form["username"];
+                    string password = Request.Form["password"];
+                    string tfa_code = Request.Form["tfa_code"];
+                    string stype = Request.Form["SType"];
+                    if (username == null || password == null || tfa_code == null || stype == null)
+                    {
+                        return Content("ERROR=BAD_INPUT;");
+                    }
+                    Account acc = finit.Database.GetAccount(username);
+                    if (acc == null)
+                    {
+                        return Content("ERROR=ACCOUNT_MISSING;");
+                    }
+                    LoginResult res = acc.CanLogin(password, tfa_code);
+                    if (res != LoginResult.ALLOWED)
+                    {
+                        return Content("ERROR=ACCOUNT_FAIL_CODE_" + res.ToString());
+                    }
+                    string genned = acc.GenerateSessMaster(stype);
+                    if (genned == null)
+                    {
+                        return Content("ERROR=SESSION_GENERATION_FAILURE;");
+                    }
+                    return Content("ACCEPT=SESSION/" + genned + ";");
                 }
                 // Log out of an account
                 else if (qtype == "logout")
                 {
-                    // Username, Session
+                    // Username, Session, SType
+                    // Return always successs if Username and SType are valid, otherwise error (no error for wrong sesscode)
                     return Content("ERROR=NOT_IMPLEMENTED;");
                 }
                 // Gather a one-use key to log in to a server.
                 else if (qtype == "one_use_key")
                 {
-                    // Username, Session, KeyTypeID
+                    // Username, Session, KeyTypeID, SType
+                    // Return Key
                     return Content("ERROR=NOT_IMPLEMENTED;");
                 }
                 // A server wants to check a one-use key for validity.
                 else if (qtype == "check_key")
                 {
-                    // Username, Key, KeyTypeID
+                    // Username, Key, KeyTypeID, SType
+                    // Return boolean
                     return Content("ERROR=NOT_IMPLEMENTED;");
                 }
                 // Gather a bit of information on a user's public profile data, if available.
                 else if (qtype == "mini_profile")
                 {
                     // Username
+                    // Return profile data
                     return Content("ERROR=NOT_IMPLEMENTED;");
                 }
                 else

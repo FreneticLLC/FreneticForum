@@ -99,5 +99,39 @@ namespace FreneticForum.Models
             rng.GetBytes(data);
             return BitConverter.ToString(data).Replace("-", "");
         }
+        
+        /// <summary>
+        /// Validates a username as correctly formatted.
+        /// </summary>
+        /// <param name="str">The username to validate.</param>
+        /// <returns>Whether the username is valid.</returns>
+        public static bool ValidateUsername(string str)
+        {
+            if (str == null)
+            {
+                return false;
+            }
+            // Length = 4-15
+            if (str.Length < 4 || str.Length > 15)
+            {
+                return false;
+            }
+            // Starts A-Z
+            if (!(str[0] >= 'a' && str[0] <= 'z') && !(str[0] >= 'A' && str[0] <= 'Z'))
+            {
+                return false;
+            }
+            // All symbols are A-Z, 0-9, _
+            for (int i = 0; i < str.Length; i++)
+            {
+                if (!(str[i] >= 'a' && str[i] <= 'z') && !(str[i] >= 'A' && str[i] <= 'Z')
+                    && !(str[i] >= '0' && str[i] <= '9') && !(str[i] == '_'))
+                {
+                    return false;
+                }
+            }
+            // Valid if all tests above passed
+            return true;
+        }
     }
 }

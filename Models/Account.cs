@@ -24,6 +24,7 @@ namespace FreneticForum.Models
         public const string USERNAME = "username";
         public const string UID = "uid";
         public const string WEBSESS_CODES = "websess_codes";
+        public const string PREFIX_SESS_MASTER = "sess_master_";
         public const string USES_TFA = "uses_tfa";
         public const string TFA_INTERNAL = "tfa_internal";
         public const string TFA_BACKUPS = "tfa_backups";
@@ -40,11 +41,42 @@ namespace FreneticForum.Models
 
         IMongoCollection<BsonDocument> UserBase;
 
+        public ForumDatabase FData;
+
         public Account(IMongoCollection<BsonDocument> ub, string uname, long uid)
         {
             UserBase = ub;
             UserName = uname;
             UserID = uid;
+        }
+
+        public bool IsValidSessType(string inp)
+        {
+            // TODO: Match against database list
+            return ForumUtilities.ValidateUsername(inp);
+        }
+
+        public string GenerateSessMaster(string typ)
+        {
+            if (!IsValidSessType(typ))
+            {
+                return null;
+            }
+            string sess = ForumUtilities.GetRandomHex(32);
+            FilterDefinition<BsonDocument> fd = Builders<BsonDocument>.Filter.Eq(UID, UserID);
+            UpdateDefinition<BsonDocument> ud = Builders<BsonDocument>.Update.AddToSet(PREFIX_SESS_MASTER + typ, sess);
+            FindOneAndUpdateOptions<BsonDocument> foauo = new FindOneAndUpdateOptions<BsonDocument>();
+            foauo.IsUpsert = true;
+            UserBase.FindOneAndUpdate(fd, ud, foauo);
+            return sess;
+        }
+
+        public bool TrySessMaster(string typ, string sess)
+        {
+            FilterDefinition<BsonDocument> fd = Builders<BsonDocument>.Filter.Eq(UID, UserID);
+            FilterDefinition<BsonDocument> fd_valids = Builders<BsonDocument>.Filter.AnyEq(PREFIX_SESS_MASTER + typ, sess);
+            FilterDefinition<BsonDocument> both = fd & fd_valids;
+            return UserBase.Find(both).CountAsync().Result > 0;
         }
 
         public int GetActType()
@@ -142,10 +174,14 @@ namespace FreneticForum.Models
 
         public LoginResult CanLogin(string pw, string tfa, bool checkTFA = true)
         {
-            BsonDocument acc = Projected(PASSWORD, BANNED, USES_TFA);
+            BsonDocument acc = Projected(PASSWORD, BANNED, USES_TFA, ACCOUNT_TYPE);
             if (acc == null)
             {
                 return LoginResult.MISSING;
+            }
+            if (acc[ACCOUNT_TYPE].AsInt32 != AT_VALID)
+            {
+                return LoginResult.NOT_COMPLETED_REGISTRATION;
             }
             if (acc[BANNED].AsBoolean)
             {
@@ -192,6 +228,7 @@ namespace FreneticForum.Models
         BANNED = 1,
         BAD_PASSWORD = 2,
         MISSING = 3,
-        BAD_TFA = 4
+        BAD_TFA = 4,
+        NOT_COMPLETED_REGISTRATION = 5
     }
 }
