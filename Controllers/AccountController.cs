@@ -151,12 +151,12 @@ namespace FreneticForum.Controllers
                     {
                         return Content("ERROR=BAD_KEY;");
                     }
-                    string key = acc.GenerateOneUseSess(stype);
-                    if (key == null)
+                    if (!acc.CheckOneUseSess(stype, ou_key))
                     {
-                        return Content("ERROR=KEY_GENERATION_FAILURE;");
+                        return Content("ERROR=BAD_KEY;");
                     }
-                    return Content("ACCEPT=KEY/" + key + ";");
+                    // TODO: Check IP address somehow
+                    return Content("ACCEPT=UID/" + acc.UserID + ";");
                 }
                 // Gather a bit of information on a user's public profile data, if available.
                 else if (qtype == "mini_profile")
