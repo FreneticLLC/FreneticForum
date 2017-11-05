@@ -86,14 +86,14 @@ namespace FreneticForum.Controllers
                     LoginResult res = acc.CanLogin(password, tfa_code);
                     if (res != LoginResult.ALLOWED)
                     {
-                        return Content("ERROR=ACCOUNT_FAIL_CODE_" + res.ToString());
+                        return Content("ERROR=ACCOUNT_FAIL_CODE_" + res.ToString() + ";");
                     }
                     string genned = acc.GenerateSessMaster(stype);
                     if (genned == null)
                     {
                         return Content("ERROR=SESSION_GENERATION_FAILURE;");
                     }
-                    return Content("ACCEPT=SESSION/" + genned + ";");
+                    return Content("ACCEPT=SESSION/" + genned + ",UID/" + acc.UserID + ";");
                 }
                 // Log out of an account
                 else if (qtype == "logout")
@@ -105,16 +105,58 @@ namespace FreneticForum.Controllers
                 // Gather a one-use key to log in to a server.
                 else if (qtype == "one_use_key")
                 {
-                    // Username, Session, KeyTypeID, SType
+                    // Username, Session, SType
                     // Return Key
-                    return Content("ERROR=NOT_IMPLEMENTED;");
+                    string username = Request.Form["username"];
+                    string sess_key = Request.Form["sess_key"];
+                    string stype = Request.Form["SType"];
+                    if (username == null || sess_key == null || stype == null)
+                    {
+                        return Content("ERROR=BAD_INPUT;");
+                    }
+                    Account acc = finit.Database.GetAccount(username);
+                    if (acc == null)
+                    {
+                        return Content("ERROR=ACCOUNT_MISSING;");
+                    }
+                    if (!acc.TrySessMaster(stype, sess_key))
+                    {
+                        return Content("ERROR=BAD_SESSION;");
+                    }
+                    string key = acc.GenerateOneUseSess(stype);
+                    if (key == null)
+                    {
+                        return Content("ERROR=KEY_GENERATION_FAILURE;");
+                    }
+                    return Content("ACCEPT=KEY/" + key + ";");
                 }
                 // A server wants to check a one-use key for validity.
                 else if (qtype == "check_key")
                 {
-                    // Username, Key, KeyTypeID, SType
+                    // Username, Key, SType
                     // Return boolean
-                    return Content("ERROR=NOT_IMPLEMENTED;");
+                    string username = Request.Form["username"];
+                    string ou_key = Request.Form["ou_key"];
+                    string stype = Request.Form["SType"];
+                    if (username == null || ou_key == null || stype == null)
+                    {
+                        return Content("ERROR=BAD_INPUT;");
+                    }
+                    Account acc = finit.Database.GetAccount(username);
+                    if (acc == null)
+                    {
+                        return Content("ERROR=ACCOUNT_MISSING;");
+                    }
+                    if (!acc.CheckOneUseSess(stype, ou_key))
+                    {
+                        return Content("ERROR=BAD_KEY;");
+                    }
+                    string key = acc.GenerateOneUseSess(stype);
+                    if (key == null)
+                    {
+                        return Content("ERROR=KEY_GENERATION_FAILURE;");
+                    }
+                    return Content("ACCEPT=KEY/" + key + ";");
                 }
                 // Gather a bit of information on a user's public profile data, if available.
                 else if (qtype == "mini_profile")
