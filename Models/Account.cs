@@ -112,7 +112,11 @@ namespace FreneticForum.Models
             }
             string keydat = bsd[PREFIX_ONE_USE_SESS + typ].AsString;
             string[] split = keydat.Split('/');
-            bool passed = val == split[0] && DateTimeOffset.UtcNow.Subtract(DateTimeOffset.FromUnixTimeSeconds(keydat[1])).TotalSeconds < 60; // TODO: 60: Configurable?
+            if (!long.TryParse(split[1], out long t))
+            {
+                return false;
+            }
+            bool passed = val == split[0] && DateTimeOffset.UtcNow.Subtract(DateTimeOffset.FromUnixTimeSeconds(t)).TotalSeconds < 60; // TODO: 60: Configurable?
             if (passed)
             {
                 Update(Builders<BsonDocument>.Update.Set(PREFIX_ONE_USE_SESS + typ, ""));
