@@ -151,10 +151,6 @@ namespace FreneticForum.Controllers
                     {
                         return Content("ERROR=BAD_KEY;");
                     }
-                    if (!acc.CheckOneUseSess(stype, ou_key))
-                    {
-                        return Content("ERROR=BAD_KEY;");
-                    }
                     // TODO: Check IP address somehow
                     return Content("ACCEPT=UID/" + acc.UserID + ";");
                 }
