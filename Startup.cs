@@ -46,6 +46,7 @@ namespace FreneticForum
                 }
             });
 
+            app.UseRouting();
             // Static Files (wwwroot)
             app.UseStaticFiles();
 
