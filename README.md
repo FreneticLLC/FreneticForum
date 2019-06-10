@@ -6,7 +6,7 @@ If you're seeing this, you're probably horrendously lost.
 
 ### Notice
 
-At current stage, FreneticForum is Copyright (C) 2016-2017 FreneticLLC, All Rights Reserved.
+At current stage, FreneticForum is Copyright (C) 2016-2019 FreneticLLC, All Rights Reserved.
 
 Licensing is likely to change in the future.
 
