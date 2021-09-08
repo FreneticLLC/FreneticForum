@@ -6,7 +6,7 @@ If you're seeing this, you're probably horrendously lost.
 
 ### Notice
 
-At current stage, FreneticForum is Copyright (C) 2016-2020 FreneticLLC, All Rights Reserved.
+At current stage, FreneticForum is Copyright (C) 2016-2021 FreneticLLC, All Rights Reserved.
 
 Licensing is likely to change in the future.
 
@@ -127,5 +127,5 @@ Early development. Nothing is remotely ready to use!
     - This is for searchability and content visibility.
     - EG, a topic might be tagged "Open" initially, then changed to "Resolved" later.
     - Allows multiple tags per topic.
-    - Common tags can be configured by admins to be selected-from and given special indiciation color.
+    - Common tags can be configured by admins to be selected-from and given special indication color.
     - Alternately, users can specify their own uncolored tags.
