@@ -42,6 +42,7 @@ namespace FreneticForum.Controllers
             try
             {
                 ViewData["init"] = new ForumInit(Request, Response);
+                ViewData["is_post"] = Request.Method.ToUpperFast() == "POST";
                 return View();
             }
             catch (NoProcessException)
