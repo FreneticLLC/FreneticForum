@@ -142,7 +142,7 @@ namespace FreneticForum.Models
         {
             TwoFactorAuthenticator tfao = new();
             string ihex = ForumUtilities.GetRandomB64(6);
-            SetupCode sc = tfao.GenerateSetupCode("Frenetic LLC", UserName, ihex, 300, 300, true);
+            SetupCode sc = tfao.GenerateSetupCode("Frenetic LLC", UserName, ihex, 300, 300);
             Update(Builders<BsonDocument>.Update.Set(TFA_INTERNAL, ihex));
             GenerateBackups();
             return sc;
