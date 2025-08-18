@@ -1,0 +1,85 @@
+@{
+    ForumInit init = (ForumInit)ViewData["init"];
+    ViewData["Title"] = "Register | Accounts";
+}
+
+@{
+    if (!init.IsGuest())
+    {
+        <span>
+            You're already logged in!
+        </span>
+        return;
+    }
+    string info = "";
+    if ((bool)ViewData["is_post"])
+    {
+        string password = init.Request.Form["password"].ToString();
+        string password2 = init.Request.Form["password2"].ToString();
+        string validationCode = init.Request.Form["validation_code"].ToString();
+        string username = init.Request.Form["username"].ToString();
+        string email = init.Request.Form["email"].ToString();
+        if (password != null && username != null && password2 != null && validationCode != null && email != null)
+        {
+            RegisterResult res = init.AttemptRegister(username, password, password2, validationCode, email);
+            if (res == RegisterResult.MISMATCHED_PASSWORDS)
+            {
+                info = "<b>ERROR</b>: Failed, passwords don't match!";
+            }
+            else if (res == RegisterResult.BAD_PASSWORD)
+            {
+                info = "<b>ERROR</b>: Failed, invalid password!";
+            }
+            else if (res == RegisterResult.BAD_EMAIL)
+            {
+                info = "<b>ERROR</b>: Failed, invalid email address!";
+            }
+            else if (res == RegisterResult.BAD_USERNAME)
+            {
+                info = "<b>ERROR</b>: Failed, invalid username text!";
+            }
+            else if (res == RegisterResult.USERNAME_TAKEN)
+            {
+                info = "<b>ERROR</b>: Failed, username already taken!";
+            }
+            else if (res == RegisterResult.BAD_VALIDATION)
+            {
+                info = "<b>ERROR</b>: Failed, incorrect Validation code!";
+            }
+            else if (res == RegisterResult.ACCEPTED)
+            {
+                init.Response.Redirect("/Login");
+                return;
+            }
+            else
+            {
+                info = "<b>ERROR</b>: Failed, unknown register rejection error occurred!";
+            }
+        }
+        else
+        {
+            info = "<b>ERROR</b>: Failed, null inputs!";
+        }
+    }
+}
+
+<br>@Html.Raw(info)
+
+<form id="register" method="POST">
+    <br><span class="emphasis">User Name</span>
+    <br>Clean, simple, unused username.
+    <br><input type="text" name="username" value="" placeholder="Username" class="wide_input_box" />
+    <br><span class="emphasis">Email</span>
+    <br>Your email address.
+    <br><input type="text" name="email" value="" placeholder="Email Address" class="wide_input_box" />
+    <br><span class="emphasis">Password</span>
+    <br>Your password to use. Keep it simple, clean, 10+ characters.
+    <br><input type="password" name="password" value="" class="wide_input_box" />
+    <br><span class="emphasis">Password Again</span>
+    <br>Same password as above.
+    <br><input type="password" name="password2" value="" class="wide_input_box" />
+    <br><span class="emphasis">Validation Code</span>
+    <br>Alpha web software requires you input a code here to ensure you're meant to be here.
+    <br><input type="password" name="validation_code" value="" class="wide_input_box" />
+    <br><input type="submit" value="Register" />
+</form>

@@ -237,7 +237,7 @@ namespace FreneticForum.Models
             FilterDefinition<BsonDocument> fd = Builders<BsonDocument>.Filter.Eq(Account.USERNAME, name);
             ProjectionDefinition<BsonDocument> proj = Builders<BsonDocument>.Projection.Include(Account.UID).Include(Account.USERNAME);
             BsonDocument acc = userbase.Find(fd).Project(proj).FirstOrDefaultAsync().Result;
-            if (acc == null)
+            if (acc is null)
             {
                 return null;
             }
@@ -250,11 +250,20 @@ namespace FreneticForum.Models
             FilterDefinition<BsonDocument> fd = Builders<BsonDocument>.Filter.Eq(Account.UID, uid);
             ProjectionDefinition<BsonDocument> proj = Builders<BsonDocument>.Projection.Include(Account.UID).Include(Account.USERNAME);
             BsonDocument acc = userbase.Find(fd).Project(proj).FirstOrDefaultAsync().Result;
-            if (acc == null)
+            if (acc is null)
             {
                 return null;
             }
             return new Account(userbase, (string)acc[Account.USERNAME], (long)acc[Account.UID]) { FData = this };
+        }
+
+        public void RegisterAccount(BsonDocument user)
+        {
+            IMongoCollection<BsonDocument> userbase = Database.GetCollection<BsonDocument>(TF_USERS);
+            user[Account.UID] = GetIDFor(TF_USERS);
+            user[Account.ACTIVE] = true;
+            user[Account.ACCOUNT_TYPE] = Account.AT_VALID;
+            userbase.InsertOneAsync(user).Wait();
         }
     }
 }

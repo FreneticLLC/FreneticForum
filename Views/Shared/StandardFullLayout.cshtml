@@ -3,7 +3,7 @@
     string Title = "FreneticForum";
     if (init != null)
     {
-        Title = init.Database.GetSetting("title", Title);
+        Title = ForumInit.Database.GetSetting("title", Title);
     }
 }
 <!DOCTYPE html>
@@ -50,9 +50,9 @@
     <div class="footer">
         @{
             string utcnow = ForumUtilities.DateNow();
-            long views = init == null ? 0 : init.Database.GetViewCounter("global");
+            long views = init == null ? 0 : ForumInit.Database.GetViewCounter("global");
             /* TODO: http(s) differences */
-            string mainurl = init == null ? "http://example.com" : "http://" + init.Database.GetSetting("main_url", "<Unknown>");
+            string mainurl = init == null ? "http://example.com" : "http://" + ForumInit.Database.GetSetting("main_url", "<Unknown>");
             string adaptedurl = mainurl + (init == null ? "/" : init.Request.Path.ToString());
         }
         Page Retrieved: <code>@utcnow</code>

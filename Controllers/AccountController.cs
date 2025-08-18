@@ -79,8 +79,8 @@ namespace FreneticForum.Controllers
                     {
                         return Content("ERROR=BAD_INPUT;");
                     }
-                    Account acc = finit.Database.GetAccount(username);
-                    if (acc == null)
+                    Account acc = ForumInit.Database.GetAccount(username);
+                    if (acc is null)
                     {
                         return Content("ERROR=ACCOUNT_MISSING;");
                     }
@@ -90,7 +90,7 @@ namespace FreneticForum.Controllers
                         return Content("ERROR=ACCOUNT_FAIL_CODE_" + res.ToString() + ";");
                     }
                     string genned = acc.GenerateSessMaster(stype);
-                    if (genned == null)
+                    if (genned is null)
                     {
                         return Content("ERROR=SESSION_GENERATION_FAILURE;");
                     }
@@ -115,7 +115,7 @@ namespace FreneticForum.Controllers
                     {
                         return Content("ERROR=BAD_INPUT;");
                     }
-                    Account acc = finit.Database.GetAccount(username);
+                    Account acc = ForumInit.Database.GetAccount(username);
                     if (acc == null)
                     {
                         return Content("ERROR=ACCOUNT_MISSING;");
@@ -143,7 +143,7 @@ namespace FreneticForum.Controllers
                     {
                         return Content("ERROR=BAD_INPUT;");
                     }
-                    Account acc = finit.Database.GetAccount(username);
+                    Account acc = ForumInit.Database.GetAccount(username);
                     if (acc == null)
                     {
                         return Content("ERROR=ACCOUNT_MISSING;");

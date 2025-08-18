@@ -6,9 +6,9 @@ If you're seeing this, you're probably horrendously lost.
 
 ### Notice
 
-At current stage, FreneticForum is Copyright (C) 2016-2021 FreneticLLC, All Rights Reserved.
+At current stage, FreneticForum is Copyright (C) 2016-2025 FreneticLLC, All Rights Reserved.
 
-Licensing is likely to change in the future.
+Licensing is likely to change in the future if we actually end up using this.
 
 ### Project Status
 

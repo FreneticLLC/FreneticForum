@@ -279,4 +279,15 @@ namespace FreneticForum.Models
         BAD_TFA = 4,
         NOT_COMPLETED_REGISTRATION = 5
     }
+
+    public enum RegisterResult
+    {
+        ACCEPTED = 0,
+        USERNAME_TAKEN = 1,
+        BAD_PASSWORD = 2,
+        MISMATCHED_PASSWORDS = 3,
+        BAD_VALIDATION = 4,
+        BAD_EMAIL = 5,
+        BAD_USERNAME = 6,
+    }
 }

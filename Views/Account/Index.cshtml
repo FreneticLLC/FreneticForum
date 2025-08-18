@@ -13,11 +13,11 @@
     Account account = null;
     if (usernameQuery != null && uidc == -1)
     {
-        account = init.Database.GetAccount(usernameQuery);
+        account = ForumInit.Database.GetAccount(usernameQuery);
     }
     else if (uidc != -1)
     {
-        account = init.Database.GetAccount(uidc);
+        account = ForumInit.Database.GetAccount(uidc);
     }
     if (account == null && uidQuery == null && usernameQuery == null)
     {
