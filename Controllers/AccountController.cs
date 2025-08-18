@@ -37,6 +37,19 @@ namespace FreneticForum.Controllers
             }
         }
 
+        public IActionResult Register()
+        {
+            try
+            {
+                ViewData["init"] = new ForumInit(Request, Response);
+                return View();
+            }
+            catch (NoProcessException)
+            {
+                return new EmptyResult();
+            }
+        }
+
         public IActionResult GetTFA()
         {
             try
