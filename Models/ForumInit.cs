@@ -57,7 +57,7 @@ namespace FreneticForum.Models
             {
                 return RegisterResult.MISMATCHED_PASSWORDS;
             }
-            if (password.Length < 8)
+            if (password.Length < 8 || password.Length > 128)
             {
                 return RegisterResult.BAD_PASSWORD;
             }

@@ -53,21 +53,6 @@ namespace Google.Authenticator
         /// <returns>SetupCode object</returns>
         public SetupCode GenerateSetupCode(string issuer, string accountTitleNoSpaces, string accountSecretKey, int qrCodeWidth, int qrCodeHeight)
         {
-            return GenerateSetupCode(issuer, accountTitleNoSpaces, accountSecretKey, qrCodeWidth, qrCodeHeight, false);
-        }
-
-        /// <summary>
-        /// Generate a setup code for a Google Authenticator user to scan (with issuer ID).
-        /// </summary>
-        /// <param name="issuer">Issuer ID (the name of the system, i.e. 'MyApp')</param>
-        /// <param name="accountTitleNoSpaces">Account Title (no spaces)</param>
-        /// <param name="accountSecretKey">Account Secret Key</param>
-        /// <param name="qrCodeWidth">QR Code Width</param>
-        /// <param name="qrCodeHeight">QR Code Height</param>
-        /// <param name="useHttps">Use HTTPS instead of HTTP</param>
-        /// <returns>SetupCode object</returns>
-        public SetupCode GenerateSetupCode(string issuer, string accountTitleNoSpaces, string accountSecretKey, int qrCodeWidth, int qrCodeHeight, bool useHttps)
-        {
             if (accountTitleNoSpaces is null)
             {
                 throw new NullReferenceException("Account Title is null");
@@ -89,8 +74,7 @@ namespace Google.Authenticator
             {
                 provisionUrl = UrlEncode(string.Format("otpauth://totp/{0}?secret={1}&issuer={2}", accountTitleNoSpaces, encodedSecretKey, UrlEncode(issuer)));
             }
-            string protocol = useHttps ? "https" : "http";
-            string url = string.Format("{0}://chart.googleapis.com/chart?cht=qr&chs={1}x{2}&chl={3}", protocol, qrCodeWidth, qrCodeHeight, provisionUrl);
+            string url = $"https://quickchart.io/qr?size={qrCodeWidth}x{qrCodeHeight}&text={provisionUrl}";
             sC.QrCodeSetupImageUrl = url;
             return sC;
         }
