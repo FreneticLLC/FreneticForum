@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using FreneticUtilities.FreneticExtensions;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
@@ -15,9 +16,9 @@ namespace FreneticForum.Models
         public const string TF_TOPICS = "tf_topics";
         public const string TF_POSTS = "tf_posts";
 
-        public string[] TFS = new string[] { TF_USERS, TF_SETTINGS, TF_SECTIONS, TF_TOPICS, TF_POSTS };
+        public string[] TFS = [TF_USERS, TF_SETTINGS, TF_SECTIONS, TF_TOPICS, TF_POSTS];
 
-        public string[] TFS_WITH_UIDS = new string[] { TF_USERS, TF_SECTIONS, TF_TOPICS, TF_POSTS };
+        public string[] TFS_WITH_UIDS = [TF_USERS, TF_SECTIONS, TF_TOPICS, TF_POSTS];
         
         public MongoClient Client;
 
@@ -25,8 +26,10 @@ namespace FreneticForum.Models
 
         public void InstallCollections()
         {
-            ListCollectionsOptions lco = new ListCollectionsOptions();
-            lco.Filter = Builders<BsonDocument>.Filter.Eq("name", TF_USERS);
+            ListCollectionsOptions lco = new()
+            {
+                Filter = Builders<BsonDocument>.Filter.Eq("name", TF_USERS)
+            };
             if (Database.ListCollectionsAsync(lco).Result.AnyAsync().Result)
             {
                 // We have the database already, somehow. Trying to re-create them will error, so we'll do nothing for now.
@@ -47,15 +50,15 @@ namespace FreneticForum.Models
             IMongoCollection<BsonDocument> tf_topics = Database.GetCollection<BsonDocument>(TF_TOPICS);
             IMongoCollection<BsonDocument> tf_posts = Database.GetCollection<BsonDocument>(TF_POSTS);
             // Ensure their 'Indexes'
-            CreateIndexOptions options = new CreateIndexOptions() { Unique = true };
+            CreateIndexOptions options = new() { Unique = true };
             // 'uid' for users.
             FieldDefinition<BsonDocument, long> uidField = "uid";
             tf_users.Indexes.CreateOneAsync(new IndexKeysDefinitionBuilder<BsonDocument>().Ascending(uidField), options);
             // 'username' for users.
-            StringFieldDefinition<BsonDocument> usernameField = new StringFieldDefinition<BsonDocument>("username");
+            StringFieldDefinition<BsonDocument> usernameField = new("username");
             tf_users.Indexes.CreateOneAsync(new IndexKeysDefinitionBuilder<BsonDocument>().Ascending(usernameField), options);
             // 'name' for settings.
-            StringFieldDefinition<BsonDocument> nameField = new StringFieldDefinition<BsonDocument>("name");
+            StringFieldDefinition<BsonDocument> nameField = new("name");
             tf_settings.Indexes.CreateOneAsync(new IndexKeysDefinitionBuilder<BsonDocument>().Ascending(nameField), options);
             // 'name' for sections.
             tf_sections.Indexes.CreateOneAsync(new IndexKeysDefinitionBuilder<BsonDocument>().Ascending(nameField), options);
@@ -67,24 +70,24 @@ namespace FreneticForum.Models
             tf_posts.Indexes.CreateOneAsync(new IndexKeysDefinitionBuilder<BsonDocument>().Ascending(uidField), options);
         }
 
-        public long getIDFor(string mode)
+        public long GetIDFor(string mode)
         {
             IMongoCollection<BsonDocument> tf_settings = Database.GetCollection<BsonDocument>(TF_SETTINGS);
             string id_target = "_internal.counter_ids." + mode;
             FilterDefinition<BsonDocument> fd = Builders<BsonDocument>.Filter.Eq("name", id_target);
             UpdateDefinition<BsonDocument> ud = new UpdateDefinitionBuilder<BsonDocument>().Inc("value", (long)1);
-            FindOneAndUpdateOptions<BsonDocument> uo = new FindOneAndUpdateOptions<BsonDocument>() { IsUpsert = true };
+            FindOneAndUpdateOptions<BsonDocument> uo = new() { IsUpsert = true };
             BsonDocument res = tf_settings.FindOneAndUpdateAsync(fd, ud, uo).Result;
             return res["value"].AsInt64;
         }
 
-        public long getViewCounter(string page)
+        public long GetViewCounter(string page)
         {
             IMongoCollection<BsonDocument> tf_settings = Database.GetCollection<BsonDocument>(TF_SETTINGS);
             string id_target = "count_views." + page;
             FilterDefinition<BsonDocument> fd = Builders<BsonDocument>.Filter.Eq("name", id_target);
             UpdateDefinition<BsonDocument> ud = new UpdateDefinitionBuilder<BsonDocument>().Inc("value", (long)1);
-            FindOneAndUpdateOptions<BsonDocument> uo = new FindOneAndUpdateOptions<BsonDocument>() { IsUpsert = true };
+            FindOneAndUpdateOptions<BsonDocument> uo = new() { IsUpsert = true };
             BsonDocument res = tf_settings.FindOneAndUpdateAsync(fd, ud, uo).Result;
             if (res == null)
             {
@@ -95,35 +98,37 @@ namespace FreneticForum.Models
 
         public BsonDocument CreateEmptyUserDocument()
         {
-            BsonDocument user = new BsonDocument();
-            user[Account.UID] = (long)-1;
-            user[Account.USERNAME] = "example";
-            user[Account.PASSWORD] = "This Won't Be Usable";
-            user[Account.EMAIL] = "example@example.com";
-            user[Account.DISPLAY_NAME] = "Example";
-            user[Account.BANNED] = false;
-            user[Account.BANNED_UNTIL] = "";
-            user[Account.BAN_REASON] = "";
-            user[Account.ACTIVE] = false;
-            user[Account.ACTIVATION_CODE] = "<Unusable>?";
-            user[Account.REGISTER_DATE] = ForumUtilities.DateNow();
-            user[Account.LAST_LOGIN_DATE] = "Never";
-            user[Account.USES_TFA] = false;
-            user[Account.TFA_BACKUPS] = "";
-            user[Account.TFA_INTERNAL] = "";
-            user[Account.ACCOUNT_TYPE] = Account.AT_INCOMPLETE;
-            user[Account.ROLES] = new BsonArray(new BsonValue[] { });
+            BsonDocument user = new()
+            {
+                [Account.UID] = (long)-1,
+                [Account.USERNAME] = "example",
+                [Account.PASSWORD] = "This Won't Be Usable",
+                [Account.EMAIL] = "example@example.com",
+                [Account.DISPLAY_NAME] = "Example",
+                [Account.BANNED] = false,
+                [Account.BANNED_UNTIL] = "",
+                [Account.BAN_REASON] = "",
+                [Account.ACTIVE] = false,
+                [Account.ACTIVATION_CODE] = "<Unusable>?",
+                [Account.REGISTER_DATE] = ForumUtilities.DateNow(),
+                [Account.LAST_LOGIN_DATE] = "Never",
+                [Account.USES_TFA] = false,
+                [Account.TFA_BACKUPS] = "",
+                [Account.TFA_INTERNAL] = "",
+                [Account.ACCOUNT_TYPE] = Account.AT_INCOMPLETE,
+                [Account.ROLES] = new BsonArray(Array.Empty<BsonValue>())
+            };
             return user;
         }
 
         public BsonDocument GenerateNewUser(string uname, string pw, string email)
         {
-            uname = uname.ToLowerInvariant();
+            uname = uname.ToLowerFast();
             BsonDocument bd = CreateEmptyUserDocument();
             bd[Account.USERNAME] = uname;
             bd[Account.PASSWORD] = ForumUtilities.Hash(pw, uname);
             bd[Account.EMAIL] = email;
-            bd[Account.UID] = getIDFor(TF_USERS);
+            bd[Account.UID] = GetIDFor(TF_USERS);
             bd[Account.ACTIVATION_CODE] = ForumUtilities.GetRandomHex(32);
             return bd;
         }
@@ -139,35 +144,39 @@ namespace FreneticForum.Models
             user[Account.ACTIVE] = true;
             user[Account.ACCOUNT_TYPE] = Account.AT_VALID;
             FilterDefinition<BsonDocument> fd = Builders<BsonDocument>.Filter.Eq(Account.UID, (long)0);
-            UpdateOptions uo = new UpdateOptions() { IsUpsert = true };
+            ReplaceOptions uo = new() { IsUpsert = true };
             userbase.ReplaceOneAsync(fd, user, uo).Wait();
         }
 
         public void SetSetting(IMongoCollection<BsonDocument> settings, string setting, long value)
         {
-            setting = setting.ToLowerInvariant();
-            BsonDocument doc = new BsonDocument();
-            doc["name"] = setting;
-            doc["value"] = value;
-            UpdateOptions uo = new UpdateOptions() { IsUpsert = true };
+            setting = setting.ToLowerFast();
+            BsonDocument doc = new()
+            {
+                ["name"] = setting,
+                ["value"] = value
+            };
+            ReplaceOptions uo = new() { IsUpsert = true };
             FilterDefinition<BsonDocument> fd = Builders<BsonDocument>.Filter.Eq("name", setting);
             settings.ReplaceOneAsync(fd, doc, uo).Wait();
         }
 
         public void SetSetting(IMongoCollection<BsonDocument> settings, string setting, string value)
         {
-            setting = setting.ToLowerInvariant();
-            BsonDocument doc = new BsonDocument();
-            doc["name"] = setting;
-            doc["value"] = value;
-            UpdateOptions uo = new UpdateOptions() { IsUpsert = true };
+            setting = setting.ToLowerFast();
+            BsonDocument doc = new()
+            {
+                ["name"] = setting,
+                ["value"] = value
+            };
+            ReplaceOptions uo = new() { IsUpsert = true };
             FilterDefinition<BsonDocument> fd = Builders<BsonDocument>.Filter.Eq("name", setting);
             settings.ReplaceOneAsync(fd, doc, uo).Wait();
         }
 
         public string GetSetting(string setting, string def)
         {
-            setting = setting.ToLowerInvariant();
+            setting = setting.ToLowerFast();
             IMongoCollection<BsonDocument> settings = Database.GetCollection<BsonDocument>(TF_SETTINGS);
             FilterDefinition<BsonDocument> fd = Builders<BsonDocument>.Filter.Eq("name", setting);
             BsonDocument bsd = settings.Find(fd).FirstOrDefaultAsync().Result;
@@ -180,7 +189,7 @@ namespace FreneticForum.Models
 
         public long GetLongSetting(string setting, long def)
         {
-            setting = setting.ToLowerInvariant();
+            setting = setting.ToLowerFast();
             IMongoCollection<BsonDocument> settings = Database.GetCollection<BsonDocument>(TF_SETTINGS);
             FilterDefinition<BsonDocument> fd = Builders<BsonDocument>.Filter.Eq("name", setting);
             BsonDocument bsd = settings.Find(fd).FirstOrDefaultAsync().Result;
@@ -196,9 +205,11 @@ namespace FreneticForum.Models
             IMongoCollection<BsonDocument> settings = Database.GetCollection<BsonDocument>(TF_SETTINGS);
             foreach (string str in TFS_WITH_UIDS)
             {
-                BsonDocument doc = new BsonDocument();
-                doc["name"] = "_internal.counter_ids." + str;
-                doc["value"] = (long)100;
+                BsonDocument doc = new()
+                {
+                    ["name"] = "_internal.counter_ids." + str,
+                    ["value"] = (long)100
+                };
                 settings.InsertOneAsync(doc);
             }
         }

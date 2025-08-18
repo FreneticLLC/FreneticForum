@@ -12,13 +12,13 @@ namespace FreneticForum.Models
 {
     public static class ForumUtilities
     {
-        public static HtmlString SECTION_SEPARATOR = new HtmlString("</div><div class=\"section\">");
+        public static HtmlString SECTION_SEPARATOR = new("</div><div class=\"section\">");
 
-        public static HtmlString BULLET = new HtmlString("&#9899;");
+        public static HtmlString BULLET = new("&#9899;");
 
-        public static HtmlString CHECKMARK = new HtmlString("&#10003;");
+        public static HtmlString CHECKMARK = new("&#10003;");
 
-        public static HtmlString BIG_X = new HtmlString("&#10008;");
+        public static HtmlString BIG_X = new("&#10008;");
 
         public static bool IsSafePassword(string input)
         {
@@ -73,8 +73,10 @@ namespace FreneticForum.Models
 
         private static byte[] GetPbkdf2Bytes(string password, byte[] salt, int iterations, int outputBytes)
         {
-            Rfc2898DeriveBytes pbkdf2 = new Rfc2898DeriveBytes(password, salt);
-            pbkdf2.IterationCount = iterations;
+            Rfc2898DeriveBytes pbkdf2 = new(password, salt)
+            {
+                IterationCount = iterations
+            };
             return pbkdf2.GetBytes(outputBytes);
         }
 

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using FreneticForum.Models;
+using FreneticUtilities.FreneticExtensions;
 
 namespace FreneticForum.Controllers
 {
@@ -14,7 +15,7 @@ namespace FreneticForum.Controllers
             try
             {
                 ViewData["init"] = new ForumInit(Request, Response);
-                ViewData["is_post"] = Request.Method.ToUpperInvariant() == "POST";
+                ViewData["is_post"] = Request.Method.ToUpperFast() == "POST";
                 return View();
             }
             catch (NoProcessException)
@@ -41,7 +42,7 @@ namespace FreneticForum.Controllers
             try
             {
                 ViewData["init"] = new ForumInit(Request, Response);
-                ViewData["is_post"] = Request.Method.ToUpperInvariant() == "POST";
+                ViewData["is_post"] = Request.Method.ToUpperFast() == "POST";
                 return View();
             }
             catch (NoProcessException)
@@ -54,8 +55,8 @@ namespace FreneticForum.Controllers
         {
             try
             {
-                ForumInit finit = new ForumInit(Request, Response);
-                if (Request.Method.ToUpperInvariant() != "POST")
+                ForumInit finit = new(Request, Response);
+                if (Request.Method.ToUpperFast() != "POST")
                 {
                     return Content("ERROR=NOT_POST;");
                 }
@@ -64,7 +65,7 @@ namespace FreneticForum.Controllers
                 {
                     return Content("ERROR=NO_QTYPE;");
                 }
-                qtype = qtype.ToLowerInvariant();
+                qtype = qtype.ToLowerFast();
                 // Log in to an account
                 if (qtype == "login")
                 {

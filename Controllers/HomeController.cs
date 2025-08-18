@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using FreneticForum.Models;
+using FreneticUtilities.FreneticExtensions;
 
 namespace FreneticForum.Controllers
 {
@@ -59,7 +60,7 @@ namespace FreneticForum.Controllers
             // SUPER SPECIAL CASE: Install page is only valid IF regular pages ARE NOT!
             try
             {
-                ForumInit init = new ForumInit(Request, Response);
+                ForumInit init = new(Request, Response);
                 Response.Redirect("/");
                 return new EmptyResult();
             }
@@ -71,7 +72,7 @@ namespace FreneticForum.Controllers
             {
                 // Do Nothing
             }
-            bool isPost = Request.Method.ToUpperInvariant() == "POST";
+            bool isPost = Request.Method.ToUpperFast() == "POST";
             ViewData["is_post"] = isPost;
             if (isPost)
             {

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using System.Globalization;
+using FreneticUtilities.FreneticToolkit;
 
 namespace FreneticForum
 {
@@ -12,15 +13,13 @@ namespace FreneticForum
     {
         public static void Main(string[] args)
         {
-            CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
-            CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.InvariantCulture;
-            var host = new WebHostBuilder()
+            SpecialTools.Internationalize();
+            IWebHost host = new WebHostBuilder()
                 .UseKestrel()
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .UseIISIntegration()
                 .UseStartup<Startup>()
                 .Build();
-
             host.Run();
         }
     }

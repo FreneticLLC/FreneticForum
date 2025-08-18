@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using FreneticUtilities.FreneticExtensions;
 
 namespace FreneticForum.Models
 {
@@ -35,18 +36,18 @@ namespace FreneticForum.Models
                 return null;
             }
             string[] data = File.ReadAllText(CONFIG_FILE_LOCATION).Replace("\r", "\n").Split('\n');
-            Dictionary<string, string> toret = new Dictionary<string, string>();
+            Dictionary<string, string> toret = [];
             foreach (string str in data)
             {
                 string fstr = str.Trim();
-                if (fstr.StartsWith("#"))
+                if (fstr.StartsWithFast('#'))
                 {
                     continue;
                 }
-                string[] dat = fstr.Split(new char[] { ':' }, 2);
+                string[] dat = fstr.Split([':'], 2);
                 if (dat.Length == 2)
                 {
-                    toret[dat[0].ToLowerInvariant()] = dat[1].Trim();
+                    toret[dat[0].ToLowerFast()] = dat[1].Trim();
                 }
             }
             return toret;
@@ -76,9 +77,11 @@ namespace FreneticForum.Models
                 return res;
             }
             acc.Update(Builders<BsonDocument>.Update.Set(Account.LAST_LOGIN_DATE, ForumUtilities.DateNow()));
-            CookieOptions co_uid = new CookieOptions();
-            co_uid.HttpOnly = true; // NOTE: Microsoft HttpOnly documentation appears to be backwards?
-            co_uid.Expires = DateTimeOffset.Now.AddYears(1);
+            CookieOptions co_uid = new()
+            {
+                HttpOnly = true, // NOTE: Microsoft HttpOnly documentation appears to be backwards?
+                Expires = DateTimeOffset.Now.AddYears(1)
+            };
             Response.Cookies.Append("session_uid", acc.UserID.ToString(), co_uid);
             Response.Cookies.Append("session_val", acc.GenerateSession(), co_uid);
             return LoginResult.ALLOWED;
@@ -115,8 +118,7 @@ namespace FreneticForum.Models
             {
                 string suid = Request.Cookies["session_uid"];
                 string sval = Request.Cookies["session_val"];
-                long t;
-                if (long.TryParse(suid, out t))
+                if (long.TryParse(suid, out long t))
                 {
                     User = TrySession(t, sval);
                 }

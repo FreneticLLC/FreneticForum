@@ -8,6 +8,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Html;
+using FreneticUtilities.FreneticExtensions;
 
 namespace FreneticForum.Models
 {
@@ -15,18 +16,20 @@ namespace FreneticForum.Models
     {
         public static List<BBCode> GetDefaultBBCodes()
         {
-            List<BBCode> list = new List<BBCode>();
-            list.Add(new BBCode("b", "<b>", "</b>", "Bold Text"));
-            list.Add(new BBCode("i", "<i>", "</i>", "Italic Text"));
-            list.Add(new BBCode("hr", "<hr>", "", "Horizontal Line"));
-            list.Add(new BBCode("e", "<span class=\"emphasis\">", "</span>", "Emphasized Text"));
-            list.Add(new BBCode("c", "<code>", "</code>", "In-Line Code Block", "", true));
-            list.Add(new BBCode("s", "<span class=\"strike\">", "</span>", "Strike-Through Text"));
-            list.Add(new BBCode("u", "<span class=\"underline\">", "</span>", "Underlined Text"));
-            list.Add(new BBCode("*", ForumUtilities.BULLET.ToString(), "", "List Entry"));
-            list.Add(new BBCode("size", "<span style=\"font-size:{{VALUE}}px;\">", "</span>", "Resized Text", "VALUE{7-60}") { Low = 7, High = 60 });
-            list.Add(new BBCode("url", "<a href=\"{{VALUE}}\">", "</a>", "Web Link", "http(s)://LINK_HERE") { Validator = "^https?://.*$" });
-            list.Add(new BBCode("code", "<pre>", "</pre>", "Code Block", "", true) { NoPrecedingNewline = true });
+            List<BBCode> list =
+            [
+                new BBCode("b", "<b>", "</b>", "Bold Text"),
+                new BBCode("i", "<i>", "</i>", "Italic Text"),
+                new BBCode("hr", "<hr>", "", "Horizontal Line"),
+                new BBCode("e", "<span class=\"emphasis\">", "</span>", "Emphasized Text"),
+                new BBCode("c", "<code>", "</code>", "In-Line Code Block", "", true),
+                new BBCode("s", "<span class=\"strike\">", "</span>", "Strike-Through Text"),
+                new BBCode("u", "<span class=\"underline\">", "</span>", "Underlined Text"),
+                new BBCode("*", ForumUtilities.BULLET.ToString(), "", "List Entry"),
+                new BBCode("size", "<span style=\"font-size:{{VALUE}}px;\">", "</span>", "Resized Text", "VALUE{7-60}") { Low = 7, High = 60 },
+                new BBCode("url", "<a href=\"{{VALUE}}\">", "</a>", "Web Link", "http(s)://LINK_HERE") { Validator = "^https?://.*$" },
+                new BBCode("code", "<pre>", "</pre>", "Code Block", "", true) { NoPrecedingNewline = true },
+            ];
             return list;
         }
 
@@ -35,13 +38,13 @@ namespace FreneticForum.Models
         public static List<BBCode> ActualBBCodes()
         {
             // TODO: write to and read from database.
-            return BBCodesKnown ?? (BBCodesKnown = GetDefaultBBCodes());
+            return BBCodesKnown ??= GetDefaultBBCodes();
         }
 
         public static HtmlString BBCodeInfo()
         {
             List<BBCode> codes = ActualBBCodes();
-            StringBuilder res = new StringBuilder();
+            StringBuilder res = new();
             for (int i = 0; i < codes.Count; i++)
             {
                 res.Append("<div class=\"blockify\"><code>[" + codes[i].BBC
@@ -53,7 +56,7 @@ namespace FreneticForum.Models
                 }
                 else
                 {
-                    res.Append(".");
+                    res.Append('.');
                 }
             }
             return new HtmlString(res.ToString());
@@ -65,12 +68,12 @@ namespace FreneticForum.Models
             {
                 return "(BBCode ignored, too deep...)";
             }
-            StringBuilder res = new StringBuilder();
+            StringBuilder res = new();
             for (int i = 0; i < input.Length; i++)
             {
                 if (input[i] == '[')
                 {
-                    StringBuilder tag = new StringBuilder();
+                    StringBuilder tag = new();
                     int t = i + 1;
                     while (t < input.Length)
                     {
@@ -82,17 +85,17 @@ namespace FreneticForum.Models
                     }
                     string tag_str = tag.ToString();
                     int ind = tag_str.IndexOf('=');
-                    string tag_id = tag_str.Substring(0, ind < 0 ? tag_str.Length : ind).ToLowerInvariant();
-                    string tag_value = ind < 0 ? "" : tag_str.Substring(ind + 1);
+                    string tag_id = tag_str[..(ind < 0 ? tag_str.Length : ind)].ToLowerFast();
+                    string tag_value = ind < 0 ? "" : tag_str[(ind + 1)..];
                     t++;
-                    StringBuilder content = new StringBuilder();
+                    StringBuilder content = new();
                     int selfs = 1;
                     bool gottem = false;
                     while (t < input.Length)
                     {
                         if (input[t] == '[')
                         {
-                            StringBuilder subTag = new StringBuilder();
+                            StringBuilder subTag = new();
                             t++;
                             while (t < input.Length)
                             {
@@ -103,7 +106,7 @@ namespace FreneticForum.Models
                                 subTag.Append(input[t++]);
                             }
                             string subtag_str = subTag.ToString();
-                            int subind = tag_str.IndexOf('=');
+                            //int subind = tag_str.IndexOf('=');
                             string subtag_id = subtag_str;
                             if (subtag_id == tag_id)
                             {
@@ -131,8 +134,7 @@ namespace FreneticForum.Models
                                         string repl = "";
                                         if (code.Low != -1 || code.High != -1)
                                         {
-                                            int outp;
-                                            if (!int.TryParse(tag_value, out outp))
+                                            if (!int.TryParse(tag_value, out int outp))
                                             {
                                                 break;
                                             }
@@ -168,7 +170,7 @@ namespace FreneticForum.Models
                     }
                     if (!gottem)
                     {
-                        res.Append("[");
+                        res.Append('[');
                     }
                     continue;
                 }
@@ -209,19 +211,19 @@ namespace FreneticForum.Models
         }
     }
 
-    public class BBCode
+    public class BBCode(string _bbc, string _htmlpre, string _htmlsuf, string _help, string vhelp = "", bool _plainify = false)
     {
-        public string BBC;
+        public string BBC = _bbc;
 
-        public string HTMLPrefix;
+        public string HTMLPrefix = _htmlpre;
 
-        public string HTMLSuffix;
+        public string HTMLSuffix = _htmlsuf;
 
-        public string Help;
+        public string Help = _help;
 
-        public string ValueHelp;
+        public string ValueHelp = vhelp;
 
-        public bool Plainify;
+        public bool Plainify = _plainify;
 
         public int Low = -1;
 
@@ -237,16 +239,6 @@ namespace FreneticForum.Models
             {
                 Validate = new Regex(value, RegexOptions.Compiled);
             }
-        }
-
-        public BBCode(string _bbc, string _htmlpre, string _htmlsuf, string _help, string vhelp = "", bool _plainify = false)
-        {
-            BBC = _bbc;
-            HTMLPrefix = _htmlpre;
-            HTMLSuffix = _htmlsuf;
-            Help = _help;
-            ValueHelp = vhelp;
-            Plainify = _plainify;
         }
     }
 }

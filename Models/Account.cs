@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Google.Authenticator;
+using FreneticUtilities.FreneticExtensions;
 
 namespace FreneticForum.Models
 {
-    public class Account
+    public class Account(IMongoCollection<BsonDocument> ub, string uname, long uid)
     {
         public const string LAST_LOGIN_DATE = "last_login_date";
         public const string REGISTER_DATE = "register_date";
@@ -32,29 +33,22 @@ namespace FreneticForum.Models
         public const string ACCOUNT_TYPE = "account_type";
         public const string ROLES = "roles";
         
-        public string UserName;
+        public string UserName = uname;
 
-        public long UserID;
+        public long UserID = uid;
 
         public const int AT_INCOMPLETE = 0;
         public const int AT_GUEST = 1;
         public const int AT_VALID = 2;
 
-        IMongoCollection<BsonDocument> UserBase;
+        public IMongoCollection<BsonDocument> UserBase = ub;
 
         public ForumDatabase FData;
-
-        public Account(IMongoCollection<BsonDocument> ub, string uname, long uid)
-        {
-            UserBase = ub;
-            UserName = uname;
-            UserID = uid;
-        }
 
         public bool IsValidSessType(string inp)
         {
             // TODO: Match against database list
-            return ForumUtilities.ValidateUsername(inp) && inp.ToLowerInvariant() == inp;
+            return ForumUtilities.ValidateUsername(inp) && inp.ToLowerFast() == inp;
         }
 
         public string GenerateSessMaster(string typ)
@@ -66,8 +60,10 @@ namespace FreneticForum.Models
             string sess = ForumUtilities.GetRandomHex(32);
             FilterDefinition<BsonDocument> fd = Builders<BsonDocument>.Filter.Eq(UID, UserID);
             UpdateDefinition<BsonDocument> ud = Builders<BsonDocument>.Update.AddToSet(PREFIX_SESS_MASTER + typ, sess);
-            FindOneAndUpdateOptions<BsonDocument> foauo = new FindOneAndUpdateOptions<BsonDocument>();
-            foauo.IsUpsert = true;
+            FindOneAndUpdateOptions<BsonDocument> foauo = new()
+            {
+                IsUpsert = true
+            };
             UserBase.FindOneAndUpdate(fd, ud, foauo);
             return sess;
         }
@@ -81,7 +77,7 @@ namespace FreneticForum.Models
             FilterDefinition<BsonDocument> fd = Builders<BsonDocument>.Filter.Eq(UID, UserID);
             FilterDefinition<BsonDocument> fd_valids = Builders<BsonDocument>.Filter.AnyEq(PREFIX_SESS_MASTER + typ, sess);
             FilterDefinition<BsonDocument> both = fd & fd_valids;
-            return UserBase.Find(both).CountAsync().Result > 0;
+            return UserBase.CountDocumentsAsync(both).Result > 0;
         }
 
         public string GenerateOneUseSess(string typ)
@@ -93,8 +89,10 @@ namespace FreneticForum.Models
             string sess = ForumUtilities.GetRandomHex(32);
             FilterDefinition<BsonDocument> fd = Builders<BsonDocument>.Filter.Eq(UID, UserID);
             UpdateDefinition<BsonDocument> ud = Builders<BsonDocument>.Update.Set(PREFIX_ONE_USE_SESS + typ, sess + "/" + DateTimeOffset.UtcNow.ToUnixTimeSeconds());
-            FindOneAndUpdateOptions<BsonDocument> foauo = new FindOneAndUpdateOptions<BsonDocument>();
-            foauo.IsUpsert = true;
+            FindOneAndUpdateOptions<BsonDocument> foauo = new()
+            {
+                IsUpsert = true
+            };
             UserBase.FindOneAndUpdate(fd, ud, foauo);
             return sess;
         }
@@ -142,7 +140,7 @@ namespace FreneticForum.Models
 
         public SetupCode GenerateTFA()
         {
-            TwoFactorAuthenticator tfao = new TwoFactorAuthenticator();
+            TwoFactorAuthenticator tfao = new();
             string ihex = ForumUtilities.GetRandomB64(6);
             SetupCode sc = tfao.GenerateSetupCode("Frenetic LLC", UserName, ihex, 300, 300, true);
             Update(Builders<BsonDocument>.Update.Set(TFA_INTERNAL, ihex));
@@ -152,10 +150,10 @@ namespace FreneticForum.Models
 
         public void GenerateBackups()
         {
-            StringBuilder res = new StringBuilder();
+            StringBuilder res = new();
             for (int i = 0; i < 5; i++)
             {
-                res.Append(ForumUtilities.GetRandomHex(8)).Append("|");
+                res.Append(ForumUtilities.GetRandomHex(8)).Append('|');
             }
             Update(Builders<BsonDocument>.Update.Set(TFA_BACKUPS, res.ToString()));
         }
@@ -178,8 +176,10 @@ namespace FreneticForum.Models
         public void Update(UpdateDefinition<BsonDocument> theUpdate)
         {
             FilterDefinition<BsonDocument> fd = Builders<BsonDocument>.Filter.Eq(UID, UserID);
-            FindOneAndUpdateOptions<BsonDocument> foauo = new FindOneAndUpdateOptions<BsonDocument>();
-            foauo.IsUpsert = true;
+            FindOneAndUpdateOptions<BsonDocument> foauo = new()
+            {
+                IsUpsert = true
+            };
             UserBase.FindOneAndUpdate(fd, theUpdate, foauo);
         }
 
@@ -188,7 +188,7 @@ namespace FreneticForum.Models
             FilterDefinition<BsonDocument> fd = Builders<BsonDocument>.Filter.Eq(UID, UserID);
             FilterDefinition<BsonDocument> fd_valids = Builders<BsonDocument>.Filter.AnyEq(WEBSESS_CODES, sess);
             FilterDefinition<BsonDocument> both = fd & fd_valids;
-            return UserBase.Find(both).CountAsync().Result > 0;
+            return UserBase.CountDocumentsAsync(both).Result > 0;
         }
 
         public string GenerateSession()
@@ -196,8 +196,10 @@ namespace FreneticForum.Models
             string sess = ForumUtilities.GetRandomHex(32);
             FilterDefinition<BsonDocument> fd = Builders<BsonDocument>.Filter.Eq(UID, UserID);
             UpdateDefinition<BsonDocument> ud = Builders<BsonDocument>.Update.AddToSet(WEBSESS_CODES, sess);
-            FindOneAndUpdateOptions<BsonDocument> foauo = new FindOneAndUpdateOptions<BsonDocument>();
-            foauo.IsUpsert = true;
+            FindOneAndUpdateOptions<BsonDocument> foauo = new()
+            {
+                IsUpsert = true
+            };
             UserBase.FindOneAndUpdate(fd, ud, foauo);
             return sess;
         }
@@ -206,8 +208,10 @@ namespace FreneticForum.Models
         {
             FilterDefinition<BsonDocument> fd = Builders<BsonDocument>.Filter.Eq(UID, UserID);
             UpdateDefinition<BsonDocument> ud = Builders<BsonDocument>.Update.Unset(WEBSESS_CODES);
-            FindOneAndUpdateOptions<BsonDocument> foauo = new FindOneAndUpdateOptions<BsonDocument>();
-            foauo.IsUpsert = true;
+            FindOneAndUpdateOptions<BsonDocument> foauo = new()
+            {
+                IsUpsert = true
+            };
             UserBase.FindOneAndUpdate(fd, ud, foauo);
         }
 
@@ -261,7 +265,7 @@ namespace FreneticForum.Models
         public bool CheckTFA(string tfa)
         {
             BsonDocument acc = Projected(TFA_INTERNAL);
-            TwoFactorAuthenticator tfao = new TwoFactorAuthenticator();
+            TwoFactorAuthenticator tfao = new();
             return tfao.ValidateTwoFactorPIN(acc[TFA_INTERNAL].AsString, tfa);
         }
     }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using FreneticForum.Models;
+using FreneticUtilities.FreneticExtensions;
 
 namespace FreneticForum.Controllers
 {
@@ -26,7 +27,7 @@ namespace FreneticForum.Controllers
         {
             try
             {
-                ViewData["is_post"] = Request.Method.ToUpperInvariant() == "POST";
+                ViewData["is_post"] = Request.Method.ToUpperFast() == "POST";
                 ViewData["init"] = new ForumInit(Request, Response);
                 return View();
             }
