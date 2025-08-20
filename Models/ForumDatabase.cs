@@ -234,7 +234,7 @@ namespace FreneticForum.Models
         public Account GetAccount(string name)
         {
             IMongoCollection<BsonDocument> userbase = Database.GetCollection<BsonDocument>(TF_USERS);
-            FilterDefinition<BsonDocument> fd = Builders<BsonDocument>.Filter.Eq(Account.USERNAME, name);
+            FilterDefinition<BsonDocument> fd = Builders<BsonDocument>.Filter.Eq(Account.USERNAME, name.ToLowerFast());
             ProjectionDefinition<BsonDocument> proj = Builders<BsonDocument>.Projection.Include(Account.UID).Include(Account.USERNAME);
             BsonDocument acc = userbase.Find(fd).Project(proj).FirstOrDefaultAsync().Result;
             if (acc is null)
